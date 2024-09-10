@@ -1,95 +1,139 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { AppointmentsList } from "@/components/AppointmentList";
+import { Input } from "@/components/Input";
+import { api } from "@/lib/axios";
+import { useAppointmentStore } from "@/store/appointments.store";
+import { AppointmentData } from "@/types/appointment";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { useEffect, useState, useCallback } from "react";
+import { debounce } from 'lodash'; 
+import DataGridPagination from "@/components/DataGridPagination"; // Importe o componente de paginação
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { appointmentList, setAppointmentList } = useAppointmentStore();
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  const [loading, setLoading] = useState(true);
+  const [error, ] = useState<string | null>(null);
+
+  const [filter, setFilter] = useState<string>(''); 
+  const [inputValue, setInputValue] = useState<string>(''); 
+
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 3,
+    total: 0,
+  });
+
+  const fetchAppointments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await api.get<{ data: AppointmentData[], meta: { total: number } }>('/appointments', {
+        params: {
+          nome: filter,
+          page: pagination.page,
+          limit: pagination.limit,
+        },
+      });
+      setAppointmentList(response.data.data || []);
+      setPagination((prev) => ({
+        ...prev,
+        total: response.data.meta.total,
+      }));
+    } catch (error) {
+      console.error('Erro ao buscar atendimentos:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [filter, pagination.page, pagination.limit, setAppointmentList]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
+
+  const debouncedSetFilter = useCallback(
+    debounce((value: string) => {
+      setFilter(value);
+      setPagination((prev) => ({
+        ...prev,
+        page: 1,
+      }));
+    }, 300), 
+    []
+  );
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+    debouncedSetFilter(event.target.value); 
+  };
+
+
+  if (loading) return (
+    <Box
+        sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+            }}
+    >
+        <CircularProgress />;
+    </Box>
+  )
+  
+  if (error) return <Typography color="error">{error}</Typography>;
+
+  return (
+    <>
+      <Typography variant="h4" component="h1" sx={{ mb: 2, textAlign: 'center' }}>Lista de Atendimentos</Typography>
+
+      <Box
+        sx={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            textAlign: 'center',
+        }}
+      >
+
+      <Input
+        name="filter"
+        label="Filtrar por nome"
+        value={inputValue} 
+        onChange={handleFilterChange} 
+        sx={{width: '200px' }} 
+      />
+        
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          flex: 1,
+          mt: 4,
+        }}
+      >
+    
+
+        <AppointmentsList appointments={appointmentList} />
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', position: 'fixed', bottom: 0, width: '100%', mb:2 }}>
+          <DataGridPagination
+            count={Math.ceil(pagination.total / pagination.limit)}
+            page={pagination.page}
+            onChange={(value: number) => {
+              setPagination((prev) => ({
+                ...prev,
+                page: value,
+              }));
+            }}
           />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </Box>
+      </Box>
+    </>
   );
 }
