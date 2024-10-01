@@ -19,7 +19,7 @@ export default function EditarAtendimento({ params }: { params: { id: string } }
       const foundAppointment = appointmentList.find(appointment => appointment.id === appointmentId);
 
       if (foundAppointment) {
-        setAppointmentData(foundAppointment); 
+        setAppointmentData(foundAppointment); // Se encontrado, define o estado
       } else {
         console.error("Atendimento não encontrado com o ID:", appointmentId);
       }

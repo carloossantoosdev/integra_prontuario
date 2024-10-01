@@ -94,6 +94,7 @@ export default function Home() {
             flexDirection: 'column',
             alignItems: 'flex-start',
             textAlign: 'center',
+            m:''
         }}
       >
 
@@ -102,7 +103,7 @@ export default function Home() {
         label="Filtrar por nome"
         value={inputValue} 
         onChange={handleFilterChange} 
-        sx={{width: '200px' }} 
+        sx={{ mb: 2, width: '200px' }} 
       />
         
       </Box>

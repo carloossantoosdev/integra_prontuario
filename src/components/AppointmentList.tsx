@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import { Box, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
 import { AppointmentData } from '@/types/appointment';
 import { useRouter } from 'next/navigation';
 import { formatDate, formatTime } from '@/utils/formatedData';
-import { formatCurrency } from '@/utils/formatedMoney';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 export function AppointmentsList({ appointments }: { appointments: AppointmentData[] }) {
   const router = useRouter();
@@ -38,7 +39,12 @@ export function AppointmentsList({ appointments }: { appointments: AppointmentDa
               <TableCell>{formatDate(appointment.data_nascimento)}</TableCell>
               <TableCell>{formatDate(appointment.data_primeiro_atendimento)} {formatTime(appointment.data_primeiro_atendimento)}</TableCell>
               <TableCell>{formatDate(appointment.data_ultimo_atendimento)} {formatTime(appointment.data_ultimo_atendimento)}</TableCell>
-              <TableCell>{formatCurrency(appointment.valor)}</TableCell>
+              <TableCell>
+                        {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                        }).format(appointment.valor)}
+              </TableCell>
               <TableCell>{appointment.condutas}</TableCell>
               <TableCell>{appointment.atendente}</TableCell>
               <TableCell>
