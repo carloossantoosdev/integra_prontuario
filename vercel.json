@@ -1,13 +1,18 @@
 {
-    "rewrites": [
-      {
-        "source": "/appointments",
-        "destination": "/appointments"
-      },
-      {
-        "source": "/appointments/:path*",
-        "destination": "/appointments/:path*"
-      }
-    ]
-  }
-  
+  "rewrites": [
+    {
+      "source": "/appointments",
+      "destination": "/appointments"
+    },
+    {
+      "source": "/appointments/:path*",
+      "destination": "/index.html"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

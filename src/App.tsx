@@ -42,7 +42,7 @@ export function App() {
 								},
 							]}
 							options={{
-								syncWithLocation: true,
+								// syncWithLocation: true,
 								warnWhenUnsavedChanges: true,
 								useNewQueryKeys: true,
 								title: {

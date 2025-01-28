@@ -10,7 +10,7 @@ import {
 	ShowButton,
 	useDataGrid,
 } from '@refinedev/mui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export const AppointmentsList = () => {
@@ -21,7 +21,6 @@ export const AppointmentsList = () => {
 
 
 	const { dataGridProps } = useDataGrid({
-		syncWithLocation: true,
 		meta: {
 			select:
 				'id, nome, data_nascimento, inicio_atendimento, data_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final',
@@ -31,6 +30,8 @@ export const AppointmentsList = () => {
 	  current: Number(current), 
   },
 	});
+
+  console.log("Parâmetros da URL:", { pageSize, current });
 
 	useMany({
 		resource: 'appointments',
@@ -58,6 +59,9 @@ export const AppointmentsList = () => {
 			ssvv_final: JSON.stringify(item.ssvv_final),
 		}),
 	});
+
+
+  console.log("DataTable Props:", dataGridProps);
 
 	interface SsvvData {
 		[key: string]: string | number | null;
