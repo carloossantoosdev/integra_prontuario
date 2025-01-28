@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { Box, Button } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { useMany, useExport } from '@refinedev/core';
@@ -10,14 +11,25 @@ import {
 	useDataGrid,
 } from '@refinedev/mui';
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 export const AppointmentsList = () => {
+  const location = useLocation(); 
+  const queryParams = new URLSearchParams(location.search);
+  const pageSize = queryParams.get('pageSize') || 25; 
+  const current = queryParams.get('current') || 1; 
+
+
 	const { dataGridProps } = useDataGrid({
 		syncWithLocation: true,
 		meta: {
 			select:
 				'id, nome, data_nascimento, inicio_atendimento, data_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final',
 		},
+	pagination: {
+	  pageSize: Number(pageSize), 
+	  current: Number(current), 
+  },
 	});
 
 	useMany({
