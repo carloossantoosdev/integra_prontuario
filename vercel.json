@@ -1,0 +1,13 @@
+{
+    "rewrites": [
+      {
+        "source": "/appointments",
+        "destination": "/appointments"
+      },
+      {
+        "source": "/appointments/:path*",
+        "destination": "/appointments/:path*"
+      }
+    ]
+  }
+  
