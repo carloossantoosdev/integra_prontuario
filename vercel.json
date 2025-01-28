@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/appointments",
-      "destination": "/appointments"
-    },
-    {
       "source": "/appointments/:path*",
       "destination": "/index.html"
     }
