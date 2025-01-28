@@ -63,11 +63,22 @@ export const AppointmentsList = () => {
 
 	const columns = React.useMemo<GridColDef[]>(
 		() => [
-			{
-				field: 'id',
-				headerName: 'ID',
-				type: 'number',
-				minWidth: 10,
+      {
+				field: 'actions',
+				headerName: 'Ações',
+				sortable: false,
+				renderCell: function render({ row }) {
+					return (
+						<>
+							<ShowButton hideText recordItemId={row.id} />
+							<EditButton hideText recordItemId={row.id} />
+							<DeleteButton hideText recordItemId={row.id} />
+						</>
+					);
+				},
+				align: 'center',
+				headerAlign: 'center',
+				minWidth: 80,
 			},
 			{
 				field: 'nome',
@@ -93,12 +104,15 @@ export const AppointmentsList = () => {
 					return <DateField value={value} />;
 				},
 			},
-			{
-				field: 'valor',
-				flex: 1,
-				headerName: 'Valor',
-				minWidth: 100,
-			},
+      {
+          field: 'valor',
+          flex: 1,
+          headerName: 'Valor',
+          minWidth: 100,
+          renderCell: function render({ value }) {
+              return value ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'R$ 0,00';
+          },
+      },
 			{
 				field: 'observacoes',
 				flex: 1,
@@ -129,23 +143,7 @@ export const AppointmentsList = () => {
 					return formatSsvvData(value);
 				},
 			},
-			{
-				field: 'actions',
-				headerName: 'Ações',
-				sortable: false,
-				renderCell: function render({ row }) {
-					return (
-						<>
-							<EditButton hideText recordItemId={row.id} />
-							<ShowButton hideText recordItemId={row.id} />
-							<DeleteButton hideText recordItemId={row.id} />
-						</>
-					);
-				},
-				align: 'center',
-				headerAlign: 'center',
-				minWidth: 80,
-			},
+			
 		],
 		[],
 	);
