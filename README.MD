@@ -1,11 +1,8 @@
-# Integra Prontuário
+Veja a demonstração do projeto:
 
-<div align="center" style="margin: 30px;">
-    <a href="https://refine.dev">
-        <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
-    </a>
-</div>
-<br/>
+[![Assista ao vídeo](https://img.youtube.com/vi/-24uPCFRgoE/0.jpg)](https://www.youtube.com/watch?v=-24uPCFRgoE)
+
+# Integra Prontuário
 
 Integra Prontuário é uma aplicação desenvolvida para uma empresa de fisioterapia, projetada para ajudar os usuários a administrar informações de atendimentos, evoluções e apontamentos de diversos usuários. Este projeto é um centralizador que permite o armazenamento eficiente de dados relacionados aos atendimentos prestados pela empresa.
 
