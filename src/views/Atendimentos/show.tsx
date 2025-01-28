@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import {
 	Paper,
 	Stack,
@@ -101,7 +102,16 @@ export const AppointmentsShow = () => {
 								>
 									Valor
 								</TableCell>
-								<TableCell>{record?.valor}</TableCell>
+								<TableCell>
+									{
+										record?.valor
+											? `R$ ${record?.valor.toLocaleString('pt-BR', {
+													minimumFractionDigits: 2,
+													maximumFractionDigits: 2,
+											  })}`
+											: 'R$ 0,00'
+									}
+								</TableCell>
 							</TableRow>
 
 							<TableRow>
