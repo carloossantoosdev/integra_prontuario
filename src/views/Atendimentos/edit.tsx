@@ -6,7 +6,7 @@ import { Controller } from 'react-hook-form';
 export const AppointmentsEdit = () => {
 	const {
 		saveButtonProps,
-		refineCore: { queryResult, formLoading },
+		refineCore: { query, formLoading },
 		formState: { errors },
 		control,
 	} = useForm({
@@ -18,15 +18,20 @@ export const AppointmentsEdit = () => {
 		},
 	});
 
-	const appointmentsData = queryResult?.data?.data;
+	const appointmentsData = query?.data?.data;
 
 	useAutocomplete({
 		resource: 'appointments',
 		defaultValue: appointmentsData?.id,
 	});
 
+	const customSaveButtonProps = {
+		...saveButtonProps,
+		children: 'Salvar', 
+	};
+
 	return (
-		<Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
+		<Edit isLoading={formLoading} saveButtonProps={customSaveButtonProps} title="Editar Evolução">
 			<Box
 				component="form"
 				sx={{ display: 'flex', flexDirection: 'column' }}

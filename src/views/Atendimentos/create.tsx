@@ -15,8 +15,13 @@ export const AppointmentsCreate = () => {
 		resource: 'appointments',
 	});
 
+	const customSaveButtonProps = {
+		...saveButtonProps,
+		children: 'Salvar', 
+	};
+
 	return (
-		<Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
+		<Create isLoading={formLoading} saveButtonProps={customSaveButtonProps} title="Criar Evolução">
 			<Box
 				component="form"
 				sx={{ display: 'flex', flexDirection: 'column' }}

@@ -1,7 +1,6 @@
 import { Refine } from '@refinedev/core';
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
-
-import { RefineSnackbarProvider, notificationProvider } from '@refinedev/mui';
+import { RefineSnackbarProvider } from '@refinedev/mui';
 
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalStyles from '@mui/material/GlobalStyles';
@@ -27,12 +26,11 @@ export function App() {
 							dataProvider={dataProvider(supabaseClient)}
 							liveProvider={liveProvider(supabaseClient)}
 							routerProvider={routerBindings}
-							notificationProvider={notificationProvider}
 							resources={[
 								{
 									name: 'appointments',
 									list: '/appointments',
-									create: '/appointments/create',
+									// create: '/appointments/create',
 									edit: '/appointments/edit/:id',
 									show: '/appointments/show/:id',
 									meta: {
@@ -51,7 +49,6 @@ export function App() {
 							}}
 						>
 							<AppRoutes />
-
 							<RefineKbar />
 							<UnsavedChangesNotifier />
 							<DocumentTitleHandler />
