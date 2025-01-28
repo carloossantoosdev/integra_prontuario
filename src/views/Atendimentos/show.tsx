@@ -10,17 +10,17 @@ import {
 	Typography,
 } from '@mui/material';
 import { useShow } from '@refinedev/core';
-import { DateField, Show } from '@refinedev/mui';
+import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
 
 export const AppointmentsShow = () => {
-	const { queryResult } = useShow({
+	const { query } = useShow({
 		meta: {
 			select:
 				'nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final',
 		},
 	});
 
-	const { data, isLoading } = queryResult;
+	const { data, isLoading } = query;
 
 	const record = data?.data;
 
@@ -49,7 +49,25 @@ export const AppointmentsShow = () => {
 	};
 
 	return (
-		<Show isLoading={isLoading}>
+		<Show 
+			isLoading={isLoading} 
+			title="Detalhes Evolução" 
+			canEdit
+			canDelete
+			headerButtons={[
+				<EditButton recordItemId={record?.id}>
+					Editar
+				</EditButton>,
+				<DeleteButton 
+					recordItemId={record?.id} 
+					confirmTitle="Deseja excluir este item?" 
+					confirmCancelText='Cancelar'
+					confirmOkText='Excluir'
+				>
+					Excluir
+				</DeleteButton>
+			]}
+		>
 			<Stack gap={2}>
 				<Typography variant="h6" fontWeight="bold" marginTop={2}>
 					Dados Pessoais do Paciente
