@@ -1,48 +1,43 @@
-# integra_prontuario
+# Integra Prontuário
 
 <div align="center" style="margin: 30px;">
     <a href="https://refine.dev">
-    <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
+        <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
     </a>
 </div>
 <br/>
 
-This [Refine](https://github.com/refinedev/refine) project was generated with [create refine-app](https://github.com/refinedev/refine/tree/master/packages/create-refine-app).
+Integra Prontuário é uma aplicação desenvolvida para uma empresa de fisioterapia, projetada para ajudar os usuários a administrar informações de atendimentos, evoluções e apontamentos de diversos usuários. Este projeto é um centralizador que permite o armazenamento eficiente de dados relacionados aos atendimentos prestados pela empresa.
+
+## Tecnologias Utilizadas
+
+Este projeto utiliza as seguintes tecnologias:
+
+- **React**: Para criação da interface de usuário.
+- **Vite**: Um build tool que fornece uma experiência de desenvolvimento ágil e leve.
+- **Supabase**: Como backend para gerenciamento de dados e autenticação.
+- **Material UI**: Para estilos e componentes pré-construídos para uma interface agradável e responsiva.
+- **React Hook Form**: Facilita o gerenciamento de formulários de forma eficiente.
+- **React Router**: Para gerenciamento de rotas dentro da aplicação.
+- **Refine.dev**: Uma biblioteca que acelera o desenvolvimento de interfaces administrativas e painéis internos.
+
+## Funcionalidades
+
+- Gerenciamento de dados de usuários.
+- Armazenamento e visualização de apontamentos e evoluções dos atendimentos.
+- Exclusão de informções.
+- Fácil navegação entre as diferentes seções através do uso do React Router.
+- Formulários bem estruturados e validados usando o React Hook Form.
+
+## Captura de Tela
+
+![Screenshot do Projeto]('https://integra-prontuario.vercel.app/') <!-- Substitua com o caminho da sua imagem de captura de tela -->
 
 ## Getting Started
 
-A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility ✨
+### Rodando o servidor de desenvolvimento
 
-Refine's hooks and components simplifies the development process and eliminates the repetitive tasks by providing industry-standard solutions for crucial aspects of a project, including authentication, access control, routing, networking, state management, and i18n.
-
-## Available Scripts
-
-### Running the development server.
+Para iniciar o servidor de desenvolvimento, utilize o seguinte comando:
 
 ```bash
-    yarn dev
-```
-
-### Building for production.
-
-```bash
-    yarn build
-```
-
-### Running the production server.
-
-```bash
-    yarn start
-```
-
-## Learn More
-
-To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)
-
-- **Supabase Data Provider** [Docs](https://refine.dev/docs/core/providers/data-provider/#overview)
-- **Material UI** [Docs](https://refine.dev/docs/ui-frameworks/mui/tutorial/)
-- **React Router** [Docs](https://refine.dev/docs/core/providers/router-provider/)
-
-## License
-
-MIT
+yarn dev
