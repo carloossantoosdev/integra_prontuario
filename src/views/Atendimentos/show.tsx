@@ -158,7 +158,7 @@ export const AppointmentsShow = () => {
 				</TableContainer>
 
 				<Typography variant="h6" fontWeight="bold" marginTop={2}>
-					Sinais vitais iniciais
+					Sinais vitais inicial
 				</Typography>
 				<TableContainer component={Paper}>
 					<Table>
@@ -167,7 +167,7 @@ export const AppointmentsShow = () => {
 				</TableContainer>
 
 				<Typography variant="h6" fontWeight="bold" marginTop={2}>
-					Sinais vitais finais
+					Sinais vitais final
 				</Typography>
 				<TableContainer component={Paper}>
 					<Table>

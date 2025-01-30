@@ -27,8 +27,26 @@ export const AppointmentsEdit = () => {
 
 	const customSaveButtonProps = {
 		...saveButtonProps,
-		children: 'Salvar', 
+		children: 'Salvar',
 	};
+
+	const initialFields = [
+		{ name: "nome", type: "text", label: "Nome", required: true, defaultValue: appointmentsData?.nome },
+		{ name: "data_nascimento", type: "date", label: "Data de Nascimento", required: true, defaultValue: appointmentsData?.data_nascimento },
+		{ name: "inicio_atendimento", type: "date", label: "Início do Atendimento", required: true, defaultValue: appointmentsData?.inicio_atendimento },
+		{ name: "valor", type: "number", label: "Valor", required: true, defaultValue: appointmentsData?.valor },
+		{ name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true, defaultValue: appointmentsData?.fisioterapeuta },
+		{ name: "observacoes", type: "text", label: "Observações", required: false, defaultValue: appointmentsData?.observacoes },
+	];
+
+	const vitalSignsFields = [
+		{ name: "FC", required: true },
+		{ name: "SpO2", required: true },
+		{ name: "PA", required: true },
+		{ name: "Borg_D", required: true },
+		{ name: "Borg_F", required: true },
+		{ name: "EVA_Desc", required: true },
+	];
 
 	return (
 		<Edit isLoading={formLoading} saveButtonProps={customSaveButtonProps} title="Editar Evolução">
@@ -37,348 +55,79 @@ export const AppointmentsEdit = () => {
 				sx={{ display: 'flex', flexDirection: 'column' }}
 				autoComplete="off"
 			>
-				<Typography variant="h6" fontWeight="bold">
-					Dados do paciente
-				</Typography>
+				<Typography variant="h6" fontWeight="bold">Dados do paciente</Typography>
 
-				<Controller
-					name="nome"
-					control={control}
-					defaultValue={appointmentsData?.nome}
-					rules={{ required: 'Este campo é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							error={!!errors.nome}
-							helperText={errors.nome?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							type="text"
-							label={'Nome'}
-						/>
-					)}
-				/>
-
-				<Controller
-					name="data_nascimento"
-					control={control}
-					defaultValue={appointmentsData?.data_nascimento}
-					rules={{ required: 'Este campo é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="date"
-							error={!!errors.data_nascimento}
-							helperText={errors.data_nascimento?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Data de Nascimento'}
-						/>
-					)}
-				/>
-
-				<Controller
-					name="inicio_atendimento"
-					control={control}
-					defaultValue={appointmentsData?.inicio_atendimento}
-					rules={{ required: 'Este campo é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="date"
-							error={!!errors.inicio_atendimento}
-							helperText={errors.inicio_atendimento?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Início do Atendimento'}
-						/>
-					)}
-				/>
-
-				<Controller
-					name="valor"
-					control={control}
-					defaultValue={appointmentsData?.valor}
-					rules={{ required: 'Este campo é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors.valor}
-							helperText={errors.valor?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Valor'}
-						/>
-					)}
-				/>
-
-				<Controller
-					name="fisioterapeuta"
-					control={control}
-					defaultValue={appointmentsData?.fisioterapeuta}
-					rules={{ required: 'Este campo é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="text"
-							error={!!errors.fisioterapeuta}
-							helperText={errors.fisioterapeuta?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Fisioterapeuta'}
-						/>
-					)}
-				/>
-
-				<Controller
-					name="observacoes"
-					control={control}
-					defaultValue={appointmentsData?.observacoes}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="text"
-							error={!!errors.observacoes}
-							helperText={errors.observacoes?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Observações'}
-						/>
-					)}
-				/>
+				{initialFields.map(({ name, type, label, required, defaultValue }) => (
+					<Controller
+						key={name}
+						name={name}
+						control={control}
+						defaultValue={defaultValue}
+						rules={required ? { required: `${label} é obrigatório` } : {}}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								type={type}
+								error={!!errors[name]}
+								helperText={errors[name]?.message as string}
+								margin="normal"
+								fullWidth
+								InputLabelProps={{ shrink: true }}
+								label={label}
+							/>
+						)}
+					/>
+				))}
 
 				{/* Dados Iniciais (ssvv_inicial) */}
-				<Typography variant="h6" marginTop={2} fontWeight="bold">
-					Sinais vitais iniciais
-				</Typography>
-				<Controller
-					name="ssvv_inicial.FC"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_inicial?.FC}
-					rules={{ required: 'FC é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_inicial.FC']}
-							helperText={errors['ssvv_inicial.FC']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'FC'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_inicial.SpO2"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_inicial?.SpO2}
-					rules={{ required: 'SpO2 é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_inicial.SpO2']}
-							helperText={errors['ssvv_inicial.SpO2']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'SpO2'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_inicial.PA"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_inicial?.PA}
-					rules={{ required: 'PA é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_inicial.PA']}
-							helperText={errors['ssvv_inicial.PA']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'PA'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_inicial.Borg_D"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_inicial?.Borg_D}
-					rules={{ required: 'Borg D é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_inicial.Borg_D']}
-							helperText={errors['ssvv_inicial.Borg_D']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Borg D'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_inicial.Borg_F"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_inicial?.Borg_F}
-					rules={{ required: 'Borg F é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_inicial.Borg_F']}
-							helperText={errors['ssvv_inicial.Borg_F']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Borg F'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_inicial.EVA_Desc"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_inicial?.EVA_Desc}
-					rules={{ required: 'Descrição EVA é obrigatória' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_inicial.EVA_Desc']}
-							helperText={errors['ssvv_inicial.EVA_Desc']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'EVA Desc.'}
-						/>
-					)}
-				/>
+				<Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais inicial</Typography>
+
+				{vitalSignsFields.map(({ name, required }) => (
+					<Controller
+						key={`ssvv_inicial.${name}`}
+						name={`ssvv_inicial.${name}`}
+						control={control}
+						defaultValue={appointmentsData?.ssvv_inicial?.[name]}
+						rules={required ? { required: `${name} é obrigatório` } : {}}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
+								error={!!(errors.ssvv_inicial as any)?.[name]}
+								helperText={(errors.ssvv_inicial as any)?.[name]?.message}
+								margin="normal"
+								fullWidth
+								InputLabelProps={{ shrink: true }}
+								label={name}
+							/>
+						)}
+					/>
+				))}
 
 				{/* Dados Finais (ssvv_final) */}
-				<Typography variant="h6" marginTop={2} fontWeight="bold">
-					Sinais vitais finais
-				</Typography>
-				<Controller
-					name="ssvv_final.FC"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_final?.FC}
-					rules={{ required: 'FC é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_final.FC']}
-							helperText={errors['ssvv_final.FC']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'FC'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_final.SpO2"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_final?.SpO2}
-					rules={{ required: 'SpO2 é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_final.SpO2']}
-							helperText={errors['ssvv_final.SpO2']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'SpO2'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_final.PA"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_final?.PA}
-					rules={{ required: 'PA é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_final.PA']}
-							helperText={errors['ssvv_final.PA']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'PA'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_final.Borg_D"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_final?.Borg_D}
-					rules={{ required: 'Borg D é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_final.Borg_D']}
-							helperText={errors['ssvv_final.Borg_D']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Borg D'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_final.Borg_F"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_final?.Borg_F}
-					rules={{ required: 'Borg F é obrigatório' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_final.Borg_F']}
-							helperText={errors['ssvv_final.Borg_F']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'Borg F'}
-						/>
-					)}
-				/>
-				<Controller
-					name="ssvv_final.EVA_Desc"
-					control={control}
-					defaultValue={appointmentsData?.ssvv_final?.EVA_Desc}
-					rules={{ required: 'Descrição EVA é obrigatória' }}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							type="number"
-							error={!!errors['ssvv_final.EVA_Desc']}
-							helperText={errors['ssvv_final.EVA_Desc']?.message as string}
-							margin="normal"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							label={'EVA Desc.'}
-						/>
-					)}
-				/>
+				<Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais final</Typography>
+
+				{vitalSignsFields.map(({ name, required }) => (
+					<Controller
+						key={`ssvv_final.${name}`}
+						name={`ssvv_final.${name}`}
+						control={control}
+						defaultValue={appointmentsData?.ssvv_final?.[name]}
+						rules={required ? { required: `${name} é obrigatório` } : {}}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
+								error={!!(errors.ssvv_final as any)?.[name]}
+								helperText={(errors.ssvv_final as any)?.[name]?.message}
+								margin="normal"
+								fullWidth
+								InputLabelProps={{ shrink: true }}
+								label={name}
+							/>
+						)}
+					/>
+				))}
 			</Box>
 		</Edit>
 	);
