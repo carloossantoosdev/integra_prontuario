@@ -29,7 +29,7 @@ export const AppointmentsList = () => {
 	const { dataGridProps } = useDataGrid({
 		meta: {
 			select:
-				'id, nome, data_nascimento, inicio_atendimento, data_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final',
+				'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final',
 		},
 		pagination: {
 			pageSize: Number(pageSize), 
@@ -55,7 +55,6 @@ export const AppointmentsList = () => {
 			nome: item.nome,
 			data_nascimento: item.data_nascimento,
 			inicio_atendimento: item.inicio_atendimento,
-			data_atendimento: item.data_atendimento,
 			valor: item.valor,
 			fisioterapeuta: item.fisioterapeuta,
 			observacoes: item.observacoes,
