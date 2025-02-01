@@ -1,14 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, TextField, Typography } from '@mui/material';
 import { Edit, useAutocomplete } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
-import { Controller } from 'react-hook-form';
 
 export const AppointmentsEdit = () => {
 	const {
 		saveButtonProps,
 		refineCore: { query, formLoading },
 		formState: { errors },
-		control,
+		register
 	} = useForm({
 		refineCoreProps: {
 			meta: {
@@ -57,16 +57,10 @@ export const AppointmentsEdit = () => {
 			>
 				<Typography variant="h6" fontWeight="bold">Dados do paciente</Typography>
 
-				{initialFields.map(({ name, type, label, required, defaultValue }) => (
-					<Controller
-						key={name}
-						name={name}
-						control={control}
-						defaultValue={defaultValue}
-						rules={required ? { required: `${label} é obrigatório` } : {}}
-						render={({ field }) => (
+				{initialFields.map(({ name, type, label, required }) => (
 							<TextField
-								{...field}
+								key={name}
+								{...register(name, { required: required ? `${label} é obrigatório` : false })}
 								type={type}
 								error={!!errors[name]}
 								helperText={errors[name]?.message as string}
@@ -75,23 +69,15 @@ export const AppointmentsEdit = () => {
 								InputLabelProps={{ shrink: true }}
 								label={label}
 							/>
-						)}
-					/>
 				))}
 
-				{/* Dados Iniciais (ssvv_inicial) */}
 				<Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais inicial</Typography>
 
-				{vitalSignsFields.map(({ name, required }) => (
-					<Controller
-						key={`ssvv_inicial.${name}`}
-						name={`ssvv_inicial.${name}`}
-						control={control}
-						defaultValue={appointmentsData?.ssvv_inicial?.[name]}
-						rules={required ? { required: `${name} é obrigatório` } : {}}
-						render={({ field }) => (
+				{vitalSignsFields.map(({ name }) => (
+					
 							<TextField
-								{...field}
+								key={`ssvv_inicial.${name}`}
+								{...register(`ssvv_inicial.${name}`, { required: `${name} é obrigatório` })}
 								type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
 								error={!!(errors.ssvv_inicial as any)?.[name]}
 								helperText={(errors.ssvv_inicial as any)?.[name]?.message}
@@ -100,23 +86,14 @@ export const AppointmentsEdit = () => {
 								InputLabelProps={{ shrink: true }}
 								label={name}
 							/>
-						)}
-					/>
 				))}
 
-				{/* Dados Finais (ssvv_final) */}
 				<Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais final</Typography>
 
-				{vitalSignsFields.map(({ name, required }) => (
-					<Controller
-						key={`ssvv_final.${name}`}
-						name={`ssvv_final.${name}`}
-						control={control}
-						defaultValue={appointmentsData?.ssvv_final?.[name]}
-						rules={required ? { required: `${name} é obrigatório` } : {}}
-						render={({ field }) => (
+				{vitalSignsFields.map(({ name }) => (
 							<TextField
-								{...field}
+								key={`ssvv_final.${name}`}
+								{...register(`ssvv_final.${name}`, { required: `${name} é obrigatório` })}
 								type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
 								error={!!(errors.ssvv_final as any)?.[name]}
 								helperText={(errors.ssvv_final as any)?.[name]?.message}
@@ -125,8 +102,6 @@ export const AppointmentsEdit = () => {
 								InputLabelProps={{ shrink: true }}
 								label={name}
 							/>
-						)}
-					/>
 				))}
 			</Box>
 		</Edit>
