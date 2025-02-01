@@ -15,7 +15,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'; 
 
 type SsvvData = {
-	[key: string]: string | number;
+	[key: string]: string | number | object;
 };
 
 export const AppointmentsList = () => {
@@ -29,7 +29,7 @@ export const AppointmentsList = () => {
 	const { dataGridProps } = useDataGrid({
 		meta: {
 			select:
-				'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final',
+				'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final, ausculta_pulmonar',
 		},
 		pagination: {
 			pageSize: Number(pageSize), 
@@ -85,18 +85,18 @@ export const AppointmentsList = () => {
 			},
 			align: 'center',
 			headerAlign: 'center',
-			minWidth: 80,
+			minWidth: 100,
 		},
 		{
 			field: 'nome',
 			flex: 1,
 			headerName: 'Nome',
-			minWidth: 200,
+			minWidth: 150,
 		},
 		{
 			field: 'data_nascimento',
 			flex: 1,
-			headerName: 'Data de Nascimento',
+			headerName: 'Data nascimento',
 			minWidth: 200,
 			renderCell: function render({ value }) {
 				return (
@@ -109,7 +109,7 @@ export const AppointmentsList = () => {
 		{
 			field: 'inicio_atendimento',
 			flex: 1,
-			headerName: 'Início Atendimento',
+			headerName: 'Início atendimento',
 			minWidth: 200,
 			renderCell: function render({ value }) {
 				return (
@@ -123,7 +123,7 @@ export const AppointmentsList = () => {
 			field: 'valor',
 			flex: 1,
 			headerName: 'Valor',
-			minWidth: 100,
+			minWidth: 120,
 			renderCell: function render({ value }) {
 				return value ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'R$ 0,00';
 			},
@@ -143,7 +143,7 @@ export const AppointmentsList = () => {
 		{
 			field: 'ssvv_inicial',
 			flex: 1,
-			headerName: 'Sinais vitais iniciais',
+			headerName: 'Sinais incial',
 			minWidth: 150,
 			renderCell: function render({ value }) {
 				return formatSsvvData(value);
@@ -152,10 +152,19 @@ export const AppointmentsList = () => {
 		{
 			field: 'ssvv_final',
 			flex: 1,
-			headerName: 'Sinais vitais finais',
-			minWidth: 200,
+			headerName: 'Sinais final',
+			minWidth: 150,
 			renderCell: function render({ value }) {
 				return formatSsvvData(value);
+			},
+		},
+		{
+			field: 'ausculta_pulmonar',
+			flex: 1,
+			headerName: 'Ausculta pulmonar',
+			minWidth: 200,
+			renderCell: function render({ value }) {
+				return formatAuscultaData(value);
 			},
 		},
 	], []);
@@ -172,6 +181,21 @@ export const AppointmentsList = () => {
 			.join(', ');
 
 		return formatted;
+	};
+
+	const formatAuscultaData = (data: Record<string, any> | null): string => {
+		if (!data) return 'Sem dados';
+		
+		const formattedEntries = Object.entries(data).flatMap(([key, value]) => {
+			if (typeof value === 'object') {
+				return Object.entries(value)
+					.filter(([, val]) => val === true) 
+					.map(([subKey]) => `${key}: ${subKey}`);
+			}
+			return value === true ? `${key}: ${value}` : []; 
+		});
+
+		return formattedEntries.length > 0 ? formattedEntries.join(', ') : 'Nenhum item selecionado';
 	};
 
 	return (
