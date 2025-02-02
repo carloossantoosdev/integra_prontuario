@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { Edit, useAutocomplete } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 
@@ -32,10 +32,10 @@ export const AppointmentsEdit = () => {
 
     const initialFields = [
         { name: "nome", type: "text", label: "Nome", required: true, defaultValue: appointmentsData?.nome },
+        { name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true, defaultValue: appointmentsData?.fisioterapeuta },
         { name: "data_nascimento", type: "date", label: "Data de Nascimento", required: true, defaultValue: appointmentsData?.data_nascimento },
         { name: "inicio_atendimento", type: "date", label: "Início do Atendimento", required: true, defaultValue: appointmentsData?.inicio_atendimento },
         { name: "valor", type: "number", label: "Valor", required: true, defaultValue: appointmentsData?.valor },
-        { name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true, defaultValue: appointmentsData?.fisioterapeuta },
         { name: "observacoes", type: "text", label: "Observações", required: false, defaultValue: appointmentsData?.observacoes },
     ];
 
@@ -51,8 +51,8 @@ export const AppointmentsEdit = () => {
     // Campos de Ausculta Pulmonar
     const auscultaFields = [
         { name: 'mv', label: 'MV', options: ['presente', 'reduzido', 'abolido'] },
-        { name: 'ruídos', label: 'Ruídos', options: ['roncos', 'estridor', 'espastica', 'estertores', 'sibilos_expiratorios', 'sibilos_inspiratorios'] },
-        { name: 'localizacao', label: 'Localização', options: ['aht', 'base', 'apice', 'direita', 'esquerda'] },
+        { name: 'localizacao', label: 'Localização', options: ['AHT', 'base', 'ápice', 'direita', 'esquerda'] },
+        { name: 'ruídos', label: 'Ruídos', options: ['roncos', 'estridor', 'espástica', 'estertores', 'sibilos expiratorios', 'sibilos inspiratorios'] },
     ];
 
     return (
@@ -63,70 +63,79 @@ export const AppointmentsEdit = () => {
                 autoComplete="off"
             >
                 <Typography variant="h6" fontWeight="bold">Dados do paciente</Typography>
+                <Grid container spacing={2}>
+                    {initialFields.map(({ name, type, label, required, defaultValue }) => (
+                        <Grid item xs={6} key={name}>
+                            <TextField
+                                {...register(name, { required: required ? `${label} é obrigatório` : false })}
+                                type={type}
+                                error={!!errors[name]}
+                                helperText={errors[name]?.message as string}
+                                margin="normal"
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                label={label}
+                                defaultValue={defaultValue}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
 
-                {initialFields.map(({ name, type, label, required }) => (
-                    <TextField
-                        key={name}
-                        {...register(name, { required: required ? `${label} é obrigatório` : false })}
-                        type={type}
-                        error={!!errors[name]}
-                        helperText={errors[name]?.message as string}
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={label}
-                    />
-                ))}
+                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais Vitais Inicial</Typography>
+                <Grid container spacing={2}>
+                    {vitalSignsFields.map(({ name }) => (
+                        <Grid item xs={4} key={`ssvv_inicial.${name}`}>
+                            <TextField
+                                {...register(`ssvv_inicial.${name}`, { required: `${name} é obrigatório` })}
+                                type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
+                                error={!!(errors.ssvv_inicial as any)?.[name]}
+                                helperText={(errors.ssvv_inicial as any)?.[name]?.message}
+                                margin="normal"
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                label={name}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
 
-                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais inicial</Typography>
-                {vitalSignsFields.map(({ name }) => (
-                    <TextField
-                        key={`ssvv_inicial.${name}`}
-                        {...register(`ssvv_inicial.${name}`, { required: `${name} é obrigatório` })}
-                        type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
-                        error={!!(errors.ssvv_inicial as any)?.[name]}
-                        helperText={(errors.ssvv_inicial as any)?.[name]?.message}
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={name}
-                    />
-                ))}
-
-                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais final</Typography>
-                {vitalSignsFields.map(({ name }) => (
-                    <TextField
-                        key={`ssvv_final.${name}`}
-                        {...register(`ssvv_final.${name}`, { required: `${name} é obrigatório` })}
-                        type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
-                        error={!!(errors.ssvv_final as any)?.[name]}
-                        helperText={(errors.ssvv_final as any)?.[name]?.message}
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={name}
-                    />
-                ))}
+                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais Vitais Final</Typography>
+                <Grid container spacing={2}>
+                    {vitalSignsFields.map(({ name }) => (
+                        <Grid item xs={4} key={`ssvv_final.${name}`}>
+                            <TextField
+                                {...register(`ssvv_final.${name}`, { required: `${name} é obrigatório` })}
+                                type={name === 'SpO2' || name === 'PA' ? 'text' : 'number'}
+                                error={!!(errors.ssvv_final as any)?.[name]}
+                                helperText={(errors.ssvv_final as any)?.[name]?.message}
+                                margin="normal"
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                label={name}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
 
                 <Typography variant="h6" marginTop={2} fontWeight="bold">Ausculta Pulmonar</Typography>
-				{auscultaFields.map(({ name, label, options }) => (
-                <div key={name}>
-                    <Typography variant="subtitle1" fontWeight="bold">{label}</Typography>
-                    {options.map(option => (
-                        <FormControlLabel
-                            key={option} 
-                            control={
-                                <Checkbox
-                                    {...register(`ausculta_pulmonar.${name}.${option}`)} 
-                                    defaultChecked={appointmentsData?.ausculta_pulmonar?.[name]?.[option] || false} 
-                                    color="primary"
-                                />
-                            } 
-                            label={option.charAt(0).toUpperCase() + option.slice(1)} 
-                        />
-                    ))}
-                </div>
-            ))}
+                {auscultaFields.map(({ name, label, options }) => (
+                    <div key={name}>
+                        <Typography variant="subtitle1" fontWeight="bold">{label}</Typography>
+                        {options.map(option => (
+                            <FormControlLabel
+                                key={option}
+                                control={
+                                    <Checkbox
+                                        {...register(`ausculta_pulmonar.${name}.${option}`)}
+                                        defaultChecked={appointmentsData?.ausculta_pulmonar?.[name]?.[option] || false}
+                                        color="primary"
+                                    />
+                                }
+                                label={option.charAt(0).toUpperCase() + option.slice(1)}
+                            />
+                        ))}
+                    </div>
+                ))}
             </Box>
         </Edit>
     );
