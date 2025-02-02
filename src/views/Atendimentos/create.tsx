@@ -1,4 +1,4 @@
-import { Box, TextField, Typography, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, TextField, Typography, FormControlLabel, Checkbox, Grid } from '@mui/material';
 import { Create, useAutocomplete } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -88,18 +88,18 @@ export const AppointmentsCreate = () => {
     };
 
     const initialFields = [
-        { name: "nome", type: "text", label: "Nome", required: true },
+        { name: "nome", type: "text", label: "Nome Paciente", required: true },
+        { name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true },
         { name: "data_nascimento", type: "date", label: "Data de Nascimento", required: true },
         { name: "inicio_atendimento", type: "date", label: "Início do Atendimento", required: true },
         { name: "valor", type: "number", label: "Valor", required: true },
-        { name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true },
         { name: "observacoes", type: "text", label: "Observações", required: false },
     ];
 
     const auscultaFields = [
         { name: 'mv', label: 'MV', options: ['presente', 'reduzido', 'abolido'] },
-        { name: 'ruídos', label: 'Ruídos', options: ['roncos', 'estridor', 'espastica', 'estertores', 'sibilos_expiratorios', 'sibilos_inspiratorios'] },
-        { name: 'localizacao', label: 'Localização', options: ['aht', 'base', 'apice', 'direita', 'esquerda'] },
+        { name: 'localizacao', label: 'Localização', options: ['AHT', 'base', 'Ápice', 'direita', 'esquerda'] },
+        { name: 'ruídos', label: 'Ruídos', options: ['roncos', 'estridor', 'espástica', 'estertores', 'sibilos expiratorios', 'sibilos inspiratorios'] },
     ];
 
 
@@ -110,56 +110,66 @@ export const AppointmentsCreate = () => {
                 sx={{ display: 'flex', flexDirection: 'column' }}
                 autoComplete="off"
             >
-                <Typography variant="h6" fontWeight="bold">Dados do paciente</Typography>
+           <Typography variant="h6" fontWeight="bold">Dados do paciente</Typography>
+                <Grid container spacing={2}>
+                    {initialFields.map(({ name, type, label, required }) => (
+                        <Grid item xs={6} key={name}>
+                            <TextField
+                                {...register(name, { required: required ? `${label} é obrigatório` : false })}
+                                required={name === 'observacoes' ? false : true}
+                                type={type}
+                                error={!!errors[name]}
+                                helperText={errors[name]?.message as string}
+                                margin="normal"
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                label={label}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
 
-                {initialFields.map(({ name, type, label, required }) => (
-                    <TextField
-                        key={name}
-                        {...register(name, { required: required ? `${label} é obrigatório` : false })}
-                        required={name === 'observacoes' ? false : true}
-                        type={type}
-                        error={!!errors[name]}
-                        helperText={errors[name]?.message as string}
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={label}
-                    />
-                ))}
 
-                {/* Dados Iniciais (ssvv_inicial) */}
-                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais inicial</Typography>
-                {['FC', 'SpO2', 'PA', 'Borg_D', 'Borg_F', 'EVA_Desc'].map(fieldName => (
-                    <TextField
-                        {...register(`ssvv_inicial.${fieldName}`, { required: `${fieldName} é obrigatório` })}  
-                        key={`ssvv_inicial.${fieldName}`}
-                        required={true}
-                        type={fieldName === 'SpO2' || fieldName === 'PA' ? 'text' : 'number'}
-                        error={!!(errors.ssvv_inicial as any)?.[fieldName]} 
-                        helperText={(errors.ssvv_inicial as any)?.[fieldName]?.message} 
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={fieldName}
-                    />
-                ))}
+            {/* Dados Iniciais (ssvv_inicial) */}
+            <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais inicial</Typography>
+                    <Grid container spacing={2}>
+                        {['FC', 'SpO2', 'PA', 'Borg_D', 'Borg_F', 'EVA_Desc'].map((fieldName) => (
+                            <Grid item xs={4} key={`ssvv_inicial.${fieldName}`}>
+                                <TextField
+                                    {...register(`ssvv_inicial.${fieldName}`, { required: `${fieldName} é obrigatório` })}  
+                                    required={true}
+                                    type={fieldName === 'SpO2' || fieldName === 'PA' ? 'text' : 'number'}
+                                    error={!!(errors.ssvv_inicial as any)?.[fieldName]} 
+                                    helperText={(errors.ssvv_inicial as any)?.[fieldName]?.message} 
+                                    margin="normal"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label={fieldName}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
 
-                {/* Dados Finais (ssvv_final) */}
-                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais final</Typography>
-                {['FC', 'SpO2', 'PA', 'Borg_D', 'Borg_F', 'EVA_Desc'].map(fieldName => (
-                    <TextField
-                        {...register(`ssvv_final.${fieldName}`, { required: `${fieldName} é obrigatório` })} 
-                        key={`ssvv_final.${fieldName}`} 
-                        required={true}
-                        type={fieldName === 'SpO2' || fieldName === 'PA' ? 'text' : 'number'}
-                        error={!!(errors.ssvv_final as any)?.[fieldName]} 
-                        helperText={(errors.ssvv_final as any)?.[fieldName]?.message} 
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={fieldName}
-                    />
-                ))} 
+                    {/* Dados Finais (ssvv_final) */}
+                    <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais final</Typography>
+                    <Grid container spacing={2}>
+                        {['FC', 'SpO2', 'PA', 'Borg_D', 'Borg_F', 'EVA_Desc'].map((fieldName, index) => (
+                            <Grid item xs={4} key={`ssvv_final.${fieldName}`}>
+                                <TextField
+                                    {...register(`ssvv_final.${fieldName}`, { required: `${fieldName} é obrigatório` })} 
+                                    required={true}
+                                    type={fieldName === 'SpO2' || fieldName === 'PA' ? 'text' : 'number'}
+                                    error={!!(errors.ssvv_final as any)?.[fieldName]} 
+                                    helperText={(errors.ssvv_final as any)?.[fieldName]?.message} 
+                                    margin="normal"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label={fieldName}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid> 
+
 
                 {/* Título da Ausculta Pulmonar */}
                 <Typography variant="h6" marginTop={2} fontWeight="bold">Ausculta Pulmonar</Typography>
