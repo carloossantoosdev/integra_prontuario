@@ -14,10 +14,6 @@ import {
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'; 
 
-type SsvvData = {
-	[key: string]: string | number | object;
-};
-
 export const AppointmentsList = () => {
 	const location = useLocation(); 
 	const queryParams = new URLSearchParams(location.search);
@@ -29,7 +25,7 @@ export const AppointmentsList = () => {
 	const { dataGridProps } = useDataGrid({
 		meta: {
 			select:
-				'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final, ausculta_pulmonar',
+				'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta',
 		},
 		pagination: {
 			pageSize: Number(pageSize), 
@@ -38,7 +34,7 @@ export const AppointmentsList = () => {
 	});
 
 	useMany({
-		resource: 'appointments',
+		resource: 'patients',
 		ids:
 			dataGridProps?.rows
 				?.map((item: { categories: { id: string } }) => item?.categories?.id)
@@ -48,41 +44,38 @@ export const AppointmentsList = () => {
 		},
 	});
 
-	const { triggerExport, isLoading } = useExport({
-		resource: 'appointments',
-		mapData: (item) => ({
-			id: item.id,
-			nome: item.nome,
-			data_nascimento: item.data_nascimento,
-			inicio_atendimento: item.inicio_atendimento,
-			valor: item.valor,
-			fisioterapeuta: item.fisioterapeuta,
-			observacoes: item.observacoes,
-			ssvv_inicial: JSON.stringify(item.ssvv_inicial),
-			ssvv_final: JSON.stringify(item.ssvv_final),
-		}),
-	});	
-
 	const columns = React.useMemo<GridColDef[]>(() => [
 		{
 			field: 'actions',
 			headerName: 'Ações',
 			sortable: false,
-			renderCell: function render({ row }) {
-				return (
-					<Box display="flex" justifyContent="center" alignItems="center">
-						<ShowButton hideText recordItemId={row.id} />
-						<EditButton hideText recordItemId={row.id} />
-						<DeleteButton 
-							hideText 
-							recordItemId={row.id}  
-							confirmTitle="Deseja excluir este item?" 
-							confirmCancelText='Cancelar'
-							confirmOkText='Excluir'
-						/>
-					</Box>
-				);
-			},
+			renderCell: ({ row }) => (
+				<Box display="flex" justifyContent="center" alignItems="center">
+					{/* <Button
+						variant="outlined"
+						onClick={() => navigate(`/sinais_vitais/create/${row.id}`)} // Certifique-se que row.id é o ID do paciente
+					>
+						Cadastrar Sinais Vitais
+					</Button> */}
+					<EditButton hideText recordItemId={row.id} onClick={() => navigate(`/sinais_vitais/create/${row.id}`)} />
+					<ShowButton hideText recordItemId={row.id} />
+				</Box>
+			),
+			// renderCell: function render({ row }) {
+			// 	return (
+			// 		<Box display="flex" justifyContent="center" alignItems="center">
+			// 			<ShowButton hideText recordItemId={row.id} />
+			// 			<EditButton hideText recordItemId={row.id} />
+			// 			<DeleteButton 
+			// 				hideText 
+			// 				recordItemId={row.id}  
+			// 				confirmTitle="Deseja excluir este item?" 
+			// 				confirmCancelText='Cancelar'
+			// 				confirmOkText='Excluir'
+			// 			/>
+			// 		</Box>
+			// 	);
+			// },
 			align: 'center',
 			headerAlign: 'center',
 			minWidth: 100,
@@ -140,63 +133,12 @@ export const AppointmentsList = () => {
 			headerName: 'Fisioterapeuta',
 			minWidth: 150,
 		},
-		{
-			field: 'ssvv_inicial',
-			flex: 1,
-			headerName: 'Sinais incial',
-			minWidth: 150,
-			renderCell: function render({ value }) {
-				return formatSsvvData(value);
-			},
-		},
-		{
-			field: 'ssvv_final',
-			flex: 1,
-			headerName: 'Sinais final',
-			minWidth: 150,
-			renderCell: function render({ value }) {
-				return formatSsvvData(value);
-			},
-		},
-		{
-			field: 'ausculta_pulmonar',
-			flex: 1,
-			headerName: 'Ausculta pulmonar',
-			minWidth: 200,
-			renderCell: function render({ value }) {
-				return formatAuscultaData(value);
-			},
-		},
 	], []);
 
 	const handleCreate = () => {
-		navigate('/appointments/create');  
+		navigate('/patients/create');  
 	};
 
-	const formatSsvvData = (ssvv: SsvvData | null): string => {
-		if (!ssvv) return 'Sem dados';
-
-		const formatted = Object.entries(ssvv)
-			.map(([key, value]) => `${key}: ${value}`)
-			.join(', ');
-
-		return formatted;
-	};
-
-	const formatAuscultaData = (data: Record<string, any> | null): string => {
-		if (!data) return 'Sem dados';
-		
-		const formattedEntries = Object.entries(data).flatMap(([key, value]) => {
-			if (typeof value === 'object') {
-				return Object.entries(value)
-					.filter(([, val]) => val === true) 
-					.map(([subKey]) => `${key}: ${subKey}`);
-			}
-			return value === true ? `${key}: ${value}` : []; 
-		});
-
-		return formattedEntries.length > 0 ? formattedEntries.join(', ') : 'Nenhum item selecionado';
-	};
 
 	return (
 		<List
@@ -206,17 +148,6 @@ export const AppointmentsList = () => {
 						marginTop: 2,
 					}}
 				>
-					<Button
-						onClick={triggerExport}
-						disabled={isLoading}
-						color="primary"
-						variant="outlined"
-						sx={{
-							marginRight: 2,
-						}}
-						>
-					{isLoading ? 'Exportando...' : 'Exportar'}
-					</Button>
 					<Button onClick={handleCreate} variant="contained">
 						Adicionar
 					</Button>

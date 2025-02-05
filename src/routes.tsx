@@ -10,28 +10,33 @@ import {
 	AppointmentsShow,
 } from './views/Atendimentos';
 import { Home } from './views/Home/home';
+import { SinaisVitaisCreate } from './views/Atendimentos/SinaisVitaisCreate';
+import SinaisVitaisList from './views/Atendimentos/SinaisVitaisList';
 
 export const AppRoutes = () => {
-	return (
-		<Routes>
-			<Route
-				element={
-					<ThemedLayoutV2 Header={Header}>
-						<Outlet />
-					</ThemedLayoutV2>
-				}
-			>
-				<Route path="/" element={<Home />} />
+    return (
+        <Routes>
+            <Route
+                element={
+                    <ThemedLayoutV2 Header={Header}>
+                        <Outlet />
+                    </ThemedLayoutV2>
+                }
+            >
+                <Route path="/" element={<Home />} />
 
-				<Route path="/appointments">
-					<Route index element={<AppointmentsList />} />
-					<Route path="create" element={<AppointmentsCreate />} />
-					<Route path="edit/:id" element={<AppointmentsEdit />} />
-					<Route path="show/:id" element={<AppointmentsShow />} />
-				</Route>
+                <Route path="/patients">
+                    <Route index element={<AppointmentsList />} />
+                    <Route path="create" element={<AppointmentsCreate />} />
+                    <Route path="edit/:id" element={<AppointmentsEdit />} />
+                    <Route path="show/:id" element={<AppointmentsShow />} />
+                </Route>
 
-				<Route path="*" element={<ErrorComponent />} />
-			</Route>
-		</Routes>
-	);
+                <Route path="/sinais_vitais/create/:pacienteId" element={<SinaisVitaisCreate />} />
+                <Route path="/sinais_vitais" element={<SinaisVitaisList />} />
+
+                <Route path="*" element={<ErrorComponent />} />
+            </Route>
+        </Routes>
+    );
 };

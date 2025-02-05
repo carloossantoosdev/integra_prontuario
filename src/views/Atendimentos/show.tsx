@@ -1,4 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
 import {
     Paper,
     Stack,
@@ -8,82 +7,95 @@ import {
     TableContainer,
     TableRow,
     Typography,
+    CircularProgress,
 } from '@mui/material';
 import { useShow } from '@refinedev/core';
 import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
+import { useEffect, useState } from 'react';
+import { supabaseClient } from '../../utils/supabaseClient';
+import { AuscultaPulmonar, Ssvv, VitalSigns } from '../../types/types';
 
 export const AppointmentsShow = () => {
+    const [vitalsData, setVitalsData] = useState<VitalSigns[]>([]);
+    const [loadingVitals, setLoadingVitals] = useState(true);
+
+    // Obtém os dados do paciente
     const { query } = useShow({
         meta: {
-            select:
-                'nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta, ssvv_inicial, ssvv_final, ausculta_pulmonar',
+            select: 'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta',
         },
     });
 
     const { data, isLoading } = query;
-
     const record = data?.data;
 
-    const renderDataTable = (data: Record<string, unknown> | null) => {
-        if (!data)
+    useEffect(() => {
+        const fetchVitals = async () => {
+            if (record) {
+                setLoadingVitals(true);
+                const { data: vitals, error } = await supabaseClient
+                    .from('sinais_vitais')
+                    .select('*')
+                    .eq('patient_id', record.id);
+        
+                if (error) {
+                    console.error('Erro ao buscar sinais vitais:', error);
+                } else {
+                    // Ordenar os dados para ter o mais recente primeiro
+                    setVitalsData(vitals.sort((a: VitalSigns, b: VitalSigns) => Number(new Date(b.created_at)) - Number(new Date(a.created_at))));
+                }
+                setLoadingVitals(false);
+            }
+        };
+        
+
+        fetchVitals();
+    }, [record]);
+
+    if (isLoading || loadingVitals) {
+        return <CircularProgress />;
+    }
+
+    const renderDataTable = (data: Ssvv) => {
+        if (!data) {
             return (
                 <TableRow>
                     <TableCell colSpan={2}>Sem dados</TableCell>
                 </TableRow>
             );
+        }
 
-        const rows = Object.entries(data).map(([key, value]) => (
+        return Object.entries(data).map(([key, value]) => (
             <TableRow key={key}>
-                <TableCell
-                    style={{
-                        fontWeight: 600,
-                    }}
-                >
-                    {key}
-                </TableCell>
-                <TableCell>{value as React.ReactNode}</TableCell>
+                <TableCell style={{ fontWeight: 600 }}>{key}</TableCell>
+                <TableCell>{value}</TableCell>
             </TableRow>
         ));
-
-        return rows;
     };
 
-    const renderAuscultaPulmonar = (ausculta: Record<string, unknown> | null) => {
+    // Função para renderizar os dados de ausculta pulmonar
+    const renderAuscultaPulmonar = (ausculta: AuscultaPulmonar, vital: VitalSigns) => {
         if (!ausculta) return null;
-
-        // Filtrar os dados para mostrar apenas os que são true
-        const filteredData = Object.entries(ausculta)
-            .map(([key, value]) => {
-                // Verifica se o valor é um objeto e filtra para mostrar apenas os true
-                if (typeof value === 'object') {
-                    const filteredValues = Object.entries(value || {})
-                        .filter(([, val]) => val === true)
-                        .map(([subKey]) => subKey); // Retorna apenas as chaves
-
-                    return {
-                        key,
-                        values: filteredValues,
-                    };
-                }
-
-                return null;
-            })
-            .filter(item => item); // Remove itens que são null
-
-        if (filteredData.length === 0) return null;
 
         return (
             <>
-                <Typography variant="subtitle1" fontWeight="bold" marginTop={1}>
-                    Ausculta Pulmonar
+                <Typography variant="h6" fontWeight="bold" marginTop={1}>
+                    Ausculta Pulmonar - {new Date(vital.created_at).toLocaleDateString('pt-BR')}
                 </Typography>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableBody>
-                            {filteredData.filter((item): item is { key: string; values: string[] } => item !== null).map(({ key , values }) => (
+                            {Object.entries(ausculta).map(([key, value]) => (
                                 <TableRow key={key}>
                                     <TableCell style={{ fontWeight: 600 }}>{key}</TableCell>
-                                    <TableCell>{values.join(', ') || 'Nenhum'}</TableCell>
+                                    <TableCell>
+                                        {typeof value === 'object'
+                                            ? Object.entries(value)
+                                                  .filter(([, val]) => val === true)
+                                                  .map(([subKey]) => subKey)
+                                                  .join(', ') || 'Nenhum'
+                                            : value}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -124,21 +136,18 @@ export const AppointmentsShow = () => {
                                 <TableCell style={{ fontWeight: 600 }}>Nome</TableCell>
                                 <TableCell>{record?.nome}</TableCell>
                             </TableRow>
-
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Data de Nascimento</TableCell>
                                 <TableCell>
                                     <DateField value={record?.data_nascimento} />
                                 </TableCell>
                             </TableRow>
-
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Início do Atendimento</TableCell>
                                 <TableCell>
                                     <DateField value={record?.inicio_atendimento} />
                                 </TableCell>
                             </TableRow>
-
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Valor</TableCell>
                                 <TableCell>
@@ -152,12 +161,10 @@ export const AppointmentsShow = () => {
                                     }
                                 </TableCell>
                             </TableRow>
-
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Fisioterapeuta</TableCell>
                                 <TableCell>{record?.fisioterapeuta}</TableCell>
                             </TableRow>
-
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Observações</TableCell>
                                 <TableCell>{record?.observacoes}</TableCell>
@@ -166,26 +173,33 @@ export const AppointmentsShow = () => {
                     </Table>
                 </TableContainer>
 
-                <Typography variant="h6" fontWeight="bold" marginTop={2}>
-                    Sinais vitais inicial
-                </Typography>
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableBody>{renderDataTable(record?.ssvv_inicial)}</TableBody>
-                    </Table>
-                </TableContainer>
+                {vitalsData.map((vital, index) => (
+                    <div key={vital.id} style={{ marginBottom: '20px' }}>
+                        <Typography variant="h6" fontWeight="bold" marginTop={2}>
+                            Sinais vitais inicial - {new Date(vital.created_at).toLocaleDateString('pt-BR')}
+                        </Typography>
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableBody>{renderDataTable(vital.ssvv_inicial)}</TableBody>
+                            </Table>
+                        </TableContainer>
 
-                <Typography variant="h6" fontWeight="bold" marginTop={2}>
-                    Sinais vitais final
-                </Typography>
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableBody>{renderDataTable(record?.ssvv_final)}</TableBody>
-                    </Table>
-                </TableContainer>
+                        <Typography variant="h6" fontWeight="bold" marginTop={2}>
+                            Sinais vitais final - {new Date(vital.created_at).toLocaleDateString('pt-BR')}
+                        </Typography>
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableBody>{renderDataTable(vital.ssvv_final)}</TableBody>
+                            </Table>
+                        </TableContainer>
 
-                {/* Renderizando Ausculta Pulmonar */}
-                {renderAuscultaPulmonar(record?.ausculta_pulmonar)}
+                        {/* Renderizando Ausculta Pulmonar */}
+                        {renderAuscultaPulmonar(vital.ausculta_pulmonar, vital)}
+
+                        {index < vitalsData.length - 1 && <hr style={{ margin: '40px 0' }} />}
+                    </div>
+                ))}
+
             </Stack>
         </Show>
     );

@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { Refine } from '@refinedev/core';
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
 import { RefineSnackbarProvider } from '@refinedev/mui';
@@ -28,17 +29,26 @@ export function App() {
 							routerProvider={routerBindings}
 							resources={[
 								{
-									name: 'appointments',
-									list: '/appointments',
+									name: 'patients',
+									list: '/patients',
 									// create: '/appointments/create',
-									edit: '/appointments/edit/:id',
-									show: '/appointments/show/:id',
+									edit: '/patients/edit/:id',
+									show: '/patients/show/:id',
 									meta: {
 										canDelete: true,
-										label: 'Evolução de RCP',
+										label: 'Cadastrar Paciente',
 									},
 								},
-							]}
+								{
+									name: 'sinais_vitais',
+									list: '/sinais_vitais', 
+									create: '/sinais_vitais/create/:pacienteId',
+									meta: {
+									  canDelete: true,
+									  label: 'Sinais Vitais', 
+									},
+								  },
+								]}
 							options={{
 								// syncWithLocation: true,
 								warnWhenUnsavedChanges: true,

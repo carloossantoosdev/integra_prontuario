@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
 import { Edit, useAutocomplete } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 
@@ -13,16 +13,16 @@ export const AppointmentsEdit = () => {
         refineCoreProps: {
             meta: {
                 select:
-                    'nome, data_nascimento, inicio_atendimento, valor, fisioterapeuta, observacoes, ssvv_inicial, ssvv_final, ausculta_pulmonar',
+                    'nome, data_nascimento, inicio_atendimento, valor, fisioterapeuta, observacoes',
             },
         },
     });
 
-    const appointmentsData = query?.data?.data;
+    const patientsData = query?.data?.data;
 
     useAutocomplete({
-        resource: 'appointments',
-        defaultValue: appointmentsData?.id,
+        resource: 'patients',
+        defaultValue: patientsData?.id,
     });
 
     const customSaveButtonProps = {
@@ -31,29 +31,28 @@ export const AppointmentsEdit = () => {
     };
 
     const initialFields = [
-        { name: "nome", type: "text", label: "Nome", required: true, defaultValue: appointmentsData?.nome },
-        { name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true, defaultValue: appointmentsData?.fisioterapeuta },
-        { name: "data_nascimento", type: "date", label: "Data de Nascimento", required: true, defaultValue: appointmentsData?.data_nascimento },
-        { name: "inicio_atendimento", type: "date", label: "Início do Atendimento", required: true, defaultValue: appointmentsData?.inicio_atendimento },
-        { name: "valor", type: "number", label: "Valor", required: true, defaultValue: appointmentsData?.valor },
-        { name: "observacoes", type: "text", label: "Observações", required: false, defaultValue: appointmentsData?.observacoes },
+        { name: "nome", type: "text", label: "Nome", required: true, defaultValue: patientsData?.nome },
+        { name: "fisioterapeuta", type: "text", label: "Fisioterapeuta", required: true, defaultValue: patientsData?.fisioterapeuta },
+        { name: "data_nascimento", type: "date", label: "Data de Nascimento", required: true, defaultValue: patientsData?.data_nascimento },
+        { name: "inicio_atendimento", type: "date", label: "Início do Atendimento", required: true, defaultValue: patientsData?.inicio_atendimento },
+        { name: "valor", type: "number", label: "Valor", required: true, defaultValue: patientsData?.valor },
+        { name: "observacoes", type: "text", label: "Observações", required: false, defaultValue: patientsData?.observacoes },
     ];
 
-    const vitalSignsFields = [
-        { name: "FC", required: true },
-        { name: "SpO2", required: true },
-        { name: "PA", required: true },
-        { name: "Borg_D", required: true },
-        { name: "Borg_F", required: true },
-        { name: "EVA_Desc", required: true },
-    ];
+    // const vitalSignsFields = [
+    //     { name: "FC", required: true },
+    //     { name: "SpO2", required: true },
+    //     { name: "PA", required: true },
+    //     { name: "Borg_D", required: true },
+    //     { name: "Borg_F", required: true },
+    //     { name: "EVA_Desc", required: true },
+    // ];
 
-    // Campos de Ausculta Pulmonar
-    const auscultaFields = [
-        { name: 'mv', label: 'MV', options: ['presente', 'reduzido', 'abolido'] },
-        { name: 'localizacao', label: 'Localização', options: ['AHT', 'base', 'ápice', 'direita', 'esquerda'] },
-        { name: 'ruídos', label: 'Ruídos', options: ['roncos', 'estridor', 'espástica', 'estertores', 'sibilos expiratorios', 'sibilos inspiratorios'] },
-    ];
+    // const auscultaFields = [
+    //     { name: 'mv', label: 'MV', options: ['presente', 'reduzido', 'abolido'] },
+    //     { name: 'localizacao', label: 'Localização', options: ['AHT', 'base', 'ápice', 'direita', 'esquerda'] },
+    //     { name: 'ruídos', label: 'Ruídos', options: ['roncos', 'estridor', 'espástica', 'estertores', 'sibilos expiratorios', 'sibilos inspiratorios'] },
+    // ];
 
     return (
         <Edit isLoading={formLoading} saveButtonProps={customSaveButtonProps} title="Editar Evolução">
@@ -81,7 +80,7 @@ export const AppointmentsEdit = () => {
                     ))}
                 </Grid>
 
-                <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais Vitais Inicial</Typography>
+                {/* <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais Vitais Inicial</Typography>
                 <Grid container spacing={2}>
                     {vitalSignsFields.map(({ name }) => (
                         <Grid item xs={4} key={`ssvv_inicial.${name}`}>
@@ -135,7 +134,7 @@ export const AppointmentsEdit = () => {
                             />
                         ))}
                     </div>
-                ))}
+                ))} */}
             </Box>
         </Edit>
     );
