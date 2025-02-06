@@ -16,18 +16,18 @@ import {
 import { useShow } from '@refinedev/core';
 import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
 import { useEffect, useState } from 'react';
-import { supabaseClient } from '../../utils/supabaseClient';
-import { AuscultaPulmonar, Ssvv, VitalSigns } from '../../types/types';
+import { supabaseClient } from '../../../utils/supabaseClient';
+import { AuscultaPulmonar, Ssvv, VitalSigns } from '../../../types/types';
 import { GridExpandMoreIcon } from '@mui/x-data-grid';
 
-export const AppointmentsShow = () => {
+export const PacienteShow = () => {
     const [vitalsData, setVitalsData] = useState<VitalSigns[]>([]);
     const [loadingVitals, setLoadingVitals] = useState(true);
     const [filterDate, setFilterDate] = useState('');
 
     const { query } = useShow({
         meta: {
-            select: 'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta',
+            select: 'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento, fisioterapeuta',
         },
     });
 
@@ -39,7 +39,7 @@ export const AppointmentsShow = () => {
             if (patientsData) {
                 setLoadingVitals(true);
                 const { data: vitals, error } = await supabaseClient
-                    .from('sinais_vitais')
+                    .from('evolucao_rcp')
                     .select('*')
                     .eq('patient_id', patientsData.id);
         
@@ -173,7 +173,7 @@ export const AppointmentsShow = () => {
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Observações</TableCell>
-                                <TableCell>{patientsData?.observacoes}</TableCell>
+                                <TableCell>{patientsData?.area_atendimento}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>

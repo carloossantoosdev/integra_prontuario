@@ -3,15 +3,15 @@ import { ThemedLayoutV2 } from '@refinedev/mui';
 import { ErrorComponent } from '@refinedev/mui';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { Header } from './components';
-import {
-	AppointmentsCreate,
-	AppointmentsEdit,
-	AppointmentsList,
-	AppointmentsShow,
-} from './views/Atendimentos';
 import { Home } from './views/Home/home';
-import { SinaisVitaisCreate } from './views/Atendimentos/SinaisVitaisCreate';
-import SinaisVitaisList from './views/Atendimentos/SinaisVitaisList';
+import { EvolucaoRcpCreate } from './views/Atendimentos/EvolucaoRCP/EvolucaoRcpCreate';
+import { EvolucaoRcpList } from './views/Atendimentos/EvolucaoRCP/EvolucaoRcpList';
+import { EvolucaoDnmCreate } from './views/Atendimentos/EvolucaoDNM/EvolucaoDnmCreate';
+import { EvolucaoDnmList } from './views/Atendimentos/EvolucaoDNM/EvolucaoDnmList';
+import { PacienteList } from './views/Atendimentos/Pacientes/PacienteList';
+import { PacienteEdit } from './views/Atendimentos/Pacientes/PacienteEdit';
+import { PacienteShow } from './views/Atendimentos/Pacientes/PacienteShow';
+import { PacienteCreate } from './views/Atendimentos/Pacientes/PacienteCreate';
 
 export const AppRoutes = () => {
     return (
@@ -25,15 +25,18 @@ export const AppRoutes = () => {
             >
                 <Route path="/" element={<Home />} />
 
-                <Route path="/patients">
-                    <Route index element={<AppointmentsList />} />
-                    <Route path="create" element={<AppointmentsCreate />} />
-                    <Route path="edit/:id" element={<AppointmentsEdit />} />
-                    <Route path="show/:id" element={<AppointmentsShow />} />
+                <Route path="/pacientes">
+                    <Route index element={<PacienteList />} />
+                    <Route path="create" element={<PacienteCreate />} />
+                    <Route path="edit/:id" element={<PacienteEdit />} />
+                    <Route path="show/:id" element={<PacienteShow />} />
                 </Route>
 
-                <Route path="/sinais_vitais/create/:pacienteId" element={<SinaisVitaisCreate />} />
-                <Route path="/sinais_vitais" element={<SinaisVitaisList />} />
+                <Route path="/evolucao_rcp/create/:pacienteId" element={<EvolucaoRcpCreate />} />
+                <Route path="/evolucao_rcp" element={<EvolucaoRcpList />} />
+
+                <Route path="/evolucao_dnm/create/:pacienteId" element={<EvolucaoDnmCreate />} />
+                <Route path="/evolucao_dnm" element={<EvolucaoDnmList />} />
 
                 <Route path="*" element={<ErrorComponent />} />
             </Route>
