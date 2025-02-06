@@ -8,18 +8,23 @@ import {
     TableRow,
     Typography,
     CircularProgress,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    TextField,
 } from '@mui/material';
 import { useShow } from '@refinedev/core';
 import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
 import { useEffect, useState } from 'react';
 import { supabaseClient } from '../../utils/supabaseClient';
 import { AuscultaPulmonar, Ssvv, VitalSigns } from '../../types/types';
+import { GridExpandMoreIcon } from '@mui/x-data-grid';
 
 export const AppointmentsShow = () => {
     const [vitalsData, setVitalsData] = useState<VitalSigns[]>([]);
     const [loadingVitals, setLoadingVitals] = useState(true);
+    const [filterDate, setFilterDate] = useState('');
 
-    // Obtém os dados do paciente
     const { query } = useShow({
         meta: {
             select: 'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta',
@@ -27,34 +32,36 @@ export const AppointmentsShow = () => {
     });
 
     const { data, isLoading } = query;
-    const record = data?.data;
+    const patientsData = data?.data;
 
     useEffect(() => {
         const fetchVitals = async () => {
-            if (record) {
+            if (patientsData) {
                 setLoadingVitals(true);
                 const { data: vitals, error } = await supabaseClient
                     .from('sinais_vitais')
                     .select('*')
-                    .eq('patient_id', record.id);
+                    .eq('patient_id', patientsData.id);
         
                 if (error) {
                     console.error('Erro ao buscar sinais vitais:', error);
                 } else {
-                    // Ordenar os dados para ter o mais recente primeiro
                     setVitalsData(vitals.sort((a: VitalSigns, b: VitalSigns) => Number(new Date(b.created_at)) - Number(new Date(a.created_at))));
                 }
                 setLoadingVitals(false);
             }
         };
-        
 
         fetchVitals();
-    }, [record]);
+    }, [patientsData]);
 
     if (isLoading || loadingVitals) {
         return <CircularProgress />;
     }
+
+    const filteredVitalsData = vitalsData.filter((vital) =>
+        filterDate ? new Date(vital.created_at).toISOString().slice(0, 10) === filterDate : true
+    );
 
     const renderDataTable = (data: Ssvv) => {
         if (!data) {
@@ -73,7 +80,6 @@ export const AppointmentsShow = () => {
         ));
     };
 
-    // Função para renderizar os dados de ausculta pulmonar
     const renderAuscultaPulmonar = (ausculta: AuscultaPulmonar, vital: VitalSigns) => {
         if (!ausculta) return null;
 
@@ -112,11 +118,11 @@ export const AppointmentsShow = () => {
             canEdit
             canDelete
             headerButtons={[
-                <EditButton recordItemId={record?.id}>
+                <EditButton recordItemId={patientsData?.id}>
                     Editar
                 </EditButton>,
                 <DeleteButton 
-                    recordItemId={record?.id} 
+                    recordItemId={patientsData?.id} 
                     confirmTitle="Deseja excluir este item?" 
                     confirmCancelText='Cancelar'
                     confirmOkText='Excluir'
@@ -134,26 +140,26 @@ export const AppointmentsShow = () => {
                         <TableBody>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Nome</TableCell>
-                                <TableCell>{record?.nome}</TableCell>
+                                <TableCell>{patientsData?.nome}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Data de Nascimento</TableCell>
                                 <TableCell>
-                                    <DateField value={record?.data_nascimento} />
+                                    <DateField value={patientsData?.data_nascimento} />
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Início do Atendimento</TableCell>
                                 <TableCell>
-                                    <DateField value={record?.inicio_atendimento} />
+                                    <DateField value={patientsData?.inicio_atendimento} />
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Valor</TableCell>
                                 <TableCell>
                                     {
-                                        record?.valor
-                                            ? `R$ ${record?.valor.toLocaleString('pt-BR', {
+                                        patientsData?.valor
+                                            ? `R$ ${patientsData?.valor.toLocaleString('pt-BR', {
                                                     minimumFractionDigits: 2,
                                                     maximumFractionDigits: 2,
                                                 })}`
@@ -163,41 +169,64 @@ export const AppointmentsShow = () => {
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Fisioterapeuta</TableCell>
-                                <TableCell>{record?.fisioterapeuta}</TableCell>
+                                <TableCell>{patientsData?.fisioterapeuta}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell style={{ fontWeight: 600 }}>Observações</TableCell>
-                                <TableCell>{record?.observacoes}</TableCell>
+                                <TableCell>{patientsData?.observacoes}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
                 </TableContainer>
 
-                {vitalsData.map((vital, index) => (
-                    <div key={vital.id} style={{ marginBottom: '20px' }}>
-                        <Typography variant="h6" fontWeight="bold" marginTop={2}>
-                            Sinais vitais inicial - {new Date(vital.created_at).toLocaleDateString('pt-BR')}
-                        </Typography>
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableBody>{renderDataTable(vital.ssvv_inicial)}</TableBody>
-                            </Table>
-                        </TableContainer>
+                <TextField
+                    type="date"
+                    variant="outlined"
+                    label="Filtrar por Data"
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    sx= {{
+                        marginTop: 5,
+                    }}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    InputProps={{
+                        style: { marginTop: 10, marginBottom: 16 },
+                    }}
+                />
 
-                        <Typography variant="h6" fontWeight="bold" marginTop={2}>
-                            Sinais vitais final - {new Date(vital.created_at).toLocaleDateString('pt-BR')}
-                        </Typography>
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableBody>{renderDataTable(vital.ssvv_final)}</TableBody>
-                            </Table>
-                        </TableContainer>
+                {filteredVitalsData.map((vital) => (
+                    <Accordion key={vital.id} style={{ marginBottom: '20px' }}>
+                        <AccordionSummary expandIcon={<GridExpandMoreIcon />}>
+                            <Typography variant="h6">
+                                Evolução - {new Date(vital.created_at).toLocaleDateString('pt-BR')}
+                            </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Stack spacing={2}>
+                                <Typography variant="subtitle1" fontWeight="bold">
+                                    Sinais vitais inicial
+                                </Typography>
+                                <TableContainer component={Paper}>
+                                    <Table>
+                                        <TableBody>{renderDataTable(vital.ssvv_inicial)}</TableBody>
+                                    </Table>
+                                </TableContainer>
 
-                        {/* Renderizando Ausculta Pulmonar */}
-                        {renderAuscultaPulmonar(vital.ausculta_pulmonar, vital)}
+                                <Typography variant="subtitle1" fontWeight="bold">
+                                    Sinais vitais final
+                                </Typography>
+                                <TableContainer component={Paper}>
+                                    <Table>
+                                        <TableBody>{renderDataTable(vital.ssvv_final)}</TableBody>
+                                    </Table>
+                                </TableContainer>
 
-                        {index < vitalsData.length - 1 && <hr style={{ margin: '40px 0' }} />}
-                    </div>
+                                {/* Renderizando Ausculta Pulmonar */}
+                                {renderAuscultaPulmonar(vital.ausculta_pulmonar, vital)}
+                            </Stack>
+                        </AccordionDetails>
+                    </Accordion>
                 ))}
 
             </Stack>

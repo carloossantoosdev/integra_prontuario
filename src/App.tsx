@@ -41,7 +41,7 @@ export function App() {
 								},
 								{
 									name: 'sinais_vitais',
-									list: '/sinais_vitais', 
+									// list: '/sinais_vitais', 
 									create: '/sinais_vitais/create/:pacienteId',
 									meta: {
 									  canDelete: true,
