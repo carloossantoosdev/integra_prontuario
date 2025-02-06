@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, TextField, Typography, Grid, FormControlLabel, Checkbox } from '@mui/material';
 import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
@@ -79,7 +80,7 @@ export const SinaisVitaisCreate = () => {
                     {/* Dados Finais (ssvv_final) */}
                     <Typography variant="h6" marginTop={2} fontWeight="bold">Sinais vitais final</Typography>
                     <Grid container spacing={2}>
-                        {['FC', 'SpO2', 'PA', 'Borg_D', 'Borg_F', 'EVA_Desc'].map((fieldName, index) => (
+                        {['FC', 'SpO2', 'PA', 'Borg_D', 'Borg_F', 'EVA_Desc'].map((fieldName) => (
                             <Grid item xs={4} key={`ssvv_final.${fieldName}`}>
                                 <TextField
                                     {...register(`ssvv_final.${fieldName}`, { required: `${fieldName} é obrigatório` })} 
