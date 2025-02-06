@@ -57,10 +57,10 @@ export const PacienteCreate = () => {
     ];
 
     const fisioterapeutas = [
-        { name: 'Wilayane Alves Martins - 295357 - F', value: 'Wilayane Alves' },
+        { name: 'Alisson Alves de Almeida - 296436 - F', value: 'Alisson Alves' },
         { name: 'Erika Lays Santos de Barros - 285936 - F', value: 'Erika Lays' },
         { name: 'Rafaela Maria da Silva - 295183 - F', value: 'Rafaela Maria' },
-        { name: 'Alisson Alves de Almeida - 296436 - F', value: 'Alisson Alves' },
+        { name: 'Wilayane Alves Martins - 295357 - F', value: 'Wilayane Alves' },
     ];
 
     return (
@@ -89,7 +89,7 @@ export const PacienteCreate = () => {
                     ))}
 
                 <Grid item xs={12}>
-                    <Typography variant="h6" marginTop={2} fontWeight="bold">Fisioterapeuta / Crefito</Typography>
+                    <Typography variant="h6" marginTop={2} fontWeight="bold">Fisioterapeuta / CREFITO</Typography>
                     <RadioGroup row>
                         {fisioterapeutas.map(({ name, value }) => (
                             <FormControlLabel
@@ -106,7 +106,7 @@ export const PacienteCreate = () => {
                     </RadioGroup>
                     {errors.fisioterapeuta && (
                             <FormHelperText error>{errors.fisioterapeuta.message as string}</FormHelperText>
-                        )}
+                    )}
                 </Grid>
                     
                     <Grid item xs={12}>

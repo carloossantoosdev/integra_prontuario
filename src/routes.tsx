@@ -11,7 +11,7 @@ import { EvolucaoDnmList } from './views/Atendimentos/EvolucaoDNM/EvolucaoDnmLis
 import { PacienteList } from './views/Atendimentos/Pacientes/PacienteList';
 import { PacienteEdit } from './views/Atendimentos/Pacientes/PacienteEdit';
 import { PacienteShow } from './views/Atendimentos/Pacientes/PacienteShow';
-import { PacienteCreate } from './views/Atendimentos/Pacientes/Pacientecreate';
+import { PacienteCreate } from './views/Atendimentos/Pacientes/PacienteCreate';
 
 export const AppRoutes = () => {
     return (
