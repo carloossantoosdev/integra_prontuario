@@ -1,20 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-mixed-spaces-and-tabs */
 import React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { useMany, useExport } from '@refinedev/core';
+import { useMany } from '@refinedev/core';
 import {
 	DateField,
-	DeleteButton,
-	EditButton,
 	List,
 	ShowButton,
 	useDataGrid,
 } from '@refinedev/mui';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'; 
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-export const AppointmentsList = () => {
+export const PacienteList = () => {
 	const location = useLocation(); 
 	const queryParams = new URLSearchParams(location.search);
 	const pageSize = queryParams.get('pageSize') || 10; 
@@ -25,7 +25,7 @@ export const AppointmentsList = () => {
 	const { dataGridProps } = useDataGrid({
 		meta: {
 			select:
-				'id, nome, data_nascimento, inicio_atendimento, valor, observacoes, fisioterapeuta',
+				'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento, fisioterapeuta',
 		},
 		pagination: {
 			pageSize: Number(pageSize), 
@@ -34,7 +34,7 @@ export const AppointmentsList = () => {
 	});
 
 	useMany({
-		resource: 'patients',
+		resource: 'pacientes',
 		ids:
 			dataGridProps?.rows
 				?.map((item: { categories: { id: string } }) => item?.categories?.id)
@@ -51,13 +51,17 @@ export const AppointmentsList = () => {
 			sortable: false,
 			renderCell: ({ row }) => (
 				<Box display="flex" justifyContent="center" alignItems="center">
-					{/* <Button
-						variant="outlined"
-						onClick={() => navigate(`/sinais_vitais/create/${row.id}`)} // Certifique-se que row.id é o ID do paciente
+					<IconButton
+						onClick={() => {
+							row.area_atendimento === 'RCP' 
+								? navigate(`/evolucao_rcp/create/${row.id}`) 
+								: navigate(`/evolucao_dnm/create/${row.id}`);
+						}}
 					>
-						Cadastrar Sinais Vitais
-					</Button> */}
-					<EditButton hideText recordItemId={row.id} onClick={() => navigate(`/sinais_vitais/create/${row.id}`)} />
+						 <AddCircleOutlineIcon sx={{ fontSize: 20 }} color='primary'/> 
+					</IconButton>
+					
+
 					<ShowButton hideText recordItemId={row.id} />
 				</Box>
 			),
@@ -122,9 +126,9 @@ export const AppointmentsList = () => {
 			},
 		},
 		{
-			field: 'observacoes',
+			field: 'area_atendimento',
 			flex: 1,
-			headerName: 'Observações',
+			headerName: 'Área de atendimento',
 			minWidth: 150,
 		},
 		{
@@ -136,24 +140,32 @@ export const AppointmentsList = () => {
 	], []);
 
 	const handleCreate = () => {
-		navigate('/patients/create');  
+		navigate('/pacientes/create');  
 	};
 
 
 	return (
 		<List
 			headerButtons={[
-				<Box
-					sx={{
-						marginTop: 2,
-					}}
-				>
-					<Button onClick={handleCreate} variant="contained">
-						Adicionar
-					</Button>
-				</Box>
+				null
 			]}
 		>
+			<Box
+				sx={{
+					width: '100%',
+					display: 'flex',
+					justifyContent: 'end',
+					marginBottom: 2,
+				}}
+			>
+				<Button 
+					onClick={handleCreate} 
+					variant="contained" 
+				>
+						Novo paciente
+				</Button>
+			</Box>
+				
 			<DataGrid {...dataGridProps} columns={columns}  />
 		</List>
 	);

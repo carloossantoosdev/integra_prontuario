@@ -8,10 +8,10 @@ import {
 } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DateField } from '@refinedev/mui';
-import { supabaseClient } from '../../utils/supabaseClient';
-import { VitalSigns } from '../../types/types';
+import { supabaseClient } from '../../../utils/supabaseClient';
+import { VitalSigns } from '../../../types/types';
 
-const SinaisVitaisList = () => {
+export const EvolucaoDnmList = () => {
     const [vitalsData, setVitalsData] = useState<VitalSigns[]>([]);
     const [patientName, setPatientName] = useState('');
     const [foundPatientName, setFoundPatientName] = useState(''); 
@@ -22,7 +22,7 @@ const SinaisVitaisList = () => {
         setFoundPatientName('');
 
         const { data: patients, error } = await supabaseClient
-            .from('patients')
+            .from('pacientes')
             .select('*')
             .ilike('nome', `%${patientName}%`);
 
@@ -36,7 +36,7 @@ const SinaisVitaisList = () => {
             const patientIds = patients.map(patient => patient.id);
             setFoundPatientName(patients[0].nome);
             const { data: vitals, error: vitalsError } = await supabaseClient
-                .from('sinais_vitais')
+                .from('evolucao_dnm')
                 .select('*')
                 .in('patient_id', patientIds);
 
@@ -133,4 +133,3 @@ const SinaisVitaisList = () => {
     );
 };
 
-export default SinaisVitaisList;

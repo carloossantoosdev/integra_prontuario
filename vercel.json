@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/patients/:path*",
+      "source": "/pacientes/:path*",
       "destination": "/index.html"
     },
     {

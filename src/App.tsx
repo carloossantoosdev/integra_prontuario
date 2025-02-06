@@ -29,23 +29,23 @@ export function App() {
 							routerProvider={routerBindings}
 							resources={[
 								{
-									name: 'patients',
-									list: '/patients',
-									// create: '/appointments/create',
-									edit: '/patients/edit/:id',
-									show: '/patients/show/:id',
+									name: 'pacientes',
+									list: '/pacientes',
+									create: '/paciente/create',
+									edit: '/pacientes/edit/:id',
+									show: '/pacientes/show/:id',
 									meta: {
 										canDelete: true,
 										label: 'Cadastrar Paciente',
 									},
 								},
 								{
-									name: 'sinais_vitais',
-									// list: '/sinais_vitais', 
-									create: '/sinais_vitais/create/:pacienteId',
+									name: 'evolucao_rcp',
+									// list: '/evolucao_rcp', 
+									create: '/evolucao_rcp/create/:pacienteId',
 									meta: {
 									  canDelete: true,
-									  label: 'Sinais Vitais', 
+									  label: 'evolucao_rcp', 
 									},
 								  },
 								]}
