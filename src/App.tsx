@@ -14,6 +14,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ColorModeContextProvider } from './contexts/color-mode';
 import { AppRoutes } from './routes';
 import { supabaseClient } from './utils/supabaseClient';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 export function App() {
   return (
@@ -42,6 +43,7 @@ export function App() {
                 {
                   name: 'evolucao_rcp',
                   // list: '/evolucao_rcp',
+                  edit: '/evolucao_rcp/edit/:id',
                   create: '/evolucao_rcp/create/:pacienteId',
                   meta: {
                     canDelete: true,
@@ -50,11 +52,11 @@ export function App() {
                 },
               ]}
               options={{
-                // syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
                 useNewQueryKeys: true,
                 title: {
                   text: 'Integra',
+                  icon: <AcUnitIcon />,
                 },
               }}
             >

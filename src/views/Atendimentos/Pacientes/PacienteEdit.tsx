@@ -13,7 +13,7 @@ export const PacienteEdit = () => {
     refineCoreProps: {
       meta: {
         select:
-          'nome, data_nascimento, inicio_atendimento, valor, fisioterapeuta, area_atendimento',
+          'nome, data_nascimento, inicio_atendimento, valor, area_atendimento',
       },
     },
   });
@@ -39,11 +39,11 @@ export const PacienteEdit = () => {
       defaultValue: patientsData?.nome,
     },
     {
-      name: 'fisioterapeuta',
-      type: 'text',
-      label: 'Fisioterapeuta',
+      name: 'valor',
+      type: 'number',
+      label: 'Valor',
       required: true,
-      defaultValue: patientsData?.fisioterapeuta,
+      defaultValue: patientsData?.valor,
     },
     {
       name: 'data_nascimento',
@@ -59,13 +59,7 @@ export const PacienteEdit = () => {
       required: true,
       defaultValue: patientsData?.inicio_atendimento,
     },
-    {
-      name: 'valor',
-      type: 'number',
-      label: 'Valor',
-      required: true,
-      defaultValue: patientsData?.valor,
-    },
+
     {
       name: 'area_atendimento',
       type: 'text',
@@ -79,7 +73,7 @@ export const PacienteEdit = () => {
     <Edit
       isLoading={formLoading}
       saveButtonProps={customSaveButtonProps}
-      title="Editar Evolução"
+      title="Editar Paciente"
     >
       <Box
         component="form"
@@ -90,7 +84,7 @@ export const PacienteEdit = () => {
           variant="h6"
           fontWeight="bold"
         >
-          Dados do paciente
+          Editar Paciente: {patientsData?.nome}
         </Typography>
         <Grid
           container

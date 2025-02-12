@@ -12,6 +12,7 @@ import { PacienteList } from './views/Atendimentos/Pacientes/PacienteList';
 import { PacienteEdit } from './views/Atendimentos/Pacientes/PacienteEdit';
 import { PacienteShow } from './views/Atendimentos/Pacientes/PacienteShow';
 import { PacienteCreate } from './views/Atendimentos/Pacientes/PacienteCreate';
+import { EvolucaoEdit } from './views/Atendimentos/EvolucaoRCP/EvolucaoEdit';
 
 export const AppRoutes = () => {
   return (
@@ -54,6 +55,10 @@ export const AppRoutes = () => {
         <Route
           path="/evolucao_rcp"
           element={<EvolucaoRcpList />}
+        />
+        <Route
+          path="/evolucao_rcp/edit/:id"
+          element={<EvolucaoEdit />}
         />
 
         <Route

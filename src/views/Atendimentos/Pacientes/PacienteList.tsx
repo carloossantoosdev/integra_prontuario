@@ -4,7 +4,13 @@ import React from 'react';
 import { Box, Button, IconButton } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { useMany } from '@refinedev/core';
-import { DateField, List, ShowButton, useDataGrid } from '@refinedev/mui';
+import {
+  DateField,
+  EditButton,
+  List,
+  ShowButton,
+  useDataGrid,
+} from '@refinedev/mui';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -20,7 +26,7 @@ export const PacienteList = () => {
   const { dataGridProps } = useDataGrid({
     meta: {
       select:
-        'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento, fisioterapeuta',
+        'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento',
     },
     pagination: {
       pageSize: Number(pageSize),
@@ -72,9 +78,6 @@ export const PacienteList = () => {
         ),
         // renderCell: function render({ row }) {
         // 	return (
-        // 		<Box display="flex" justifyContent="center" alignItems="center">
-        // 			<ShowButton hideText recordItemId={row.id} />
-        // 			<EditButton hideText recordItemId={row.id} />
         // 			<DeleteButton
         // 				hideText
         // 				recordItemId={row.id}
@@ -82,12 +85,11 @@ export const PacienteList = () => {
         // 				confirmCancelText='Cancelar'
         // 				confirmOkText='Excluir'
         // 			/>
-        // 		</Box>
         // 	);
         // },
         align: 'center',
         headerAlign: 'center',
-        minWidth: 100,
+        minWidth: 110,
       },
       {
         field: 'nome',
@@ -99,7 +101,7 @@ export const PacienteList = () => {
         field: 'data_nascimento',
         flex: 1,
         headerName: 'Data nascimento',
-        minWidth: 200,
+        minWidth: 150,
         renderCell: function render({ value }) {
           return (
             <Box
@@ -117,7 +119,7 @@ export const PacienteList = () => {
         field: 'inicio_atendimento',
         flex: 1,
         headerName: 'Início atendimento',
-        minWidth: 200,
+        minWidth: 150,
         renderCell: function render({ value }) {
           return (
             <Box
@@ -135,7 +137,7 @@ export const PacienteList = () => {
         field: 'valor',
         flex: 1,
         headerName: 'Valor',
-        minWidth: 120,
+        minWidth: 110,
         renderCell: function render({ value }) {
           return value
             ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -146,12 +148,6 @@ export const PacienteList = () => {
         field: 'area_atendimento',
         flex: 1,
         headerName: 'Área de atendimento',
-        minWidth: 150,
-      },
-      {
-        field: 'fisioterapeuta',
-        flex: 1,
-        headerName: 'Fisioterapeuta',
         minWidth: 150,
       },
     ],

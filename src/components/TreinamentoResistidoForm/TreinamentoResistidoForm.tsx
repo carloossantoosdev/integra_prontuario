@@ -34,72 +34,80 @@ export const TreinamentoResistidoForm = ({
         spacing={2}
         marginTop={2}
       >
-        {resistidoExercises.map(exercise => (
-          <Grid
-            item
-            xs={12}
-            container
-            alignItems="flex-start"
-            key={exercise.value}
-            spacing={1}
-          >
-            <Grid item>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value={exercise.value}
-                    checked={Boolean(selected[exercise.value])}
-                    onChange={e => {
-                      const { checked } = e.target;
-                      const updatedExercises = { ...selected };
-                      if (checked) {
-                        updatedExercises[exercise.value] = {
-                          carga: '',
-                          series_repeticoes: '',
-                        };
-                      } else {
-                        delete updatedExercises[exercise.value];
-                      }
-                      setValue(`treinamento_resistido`, updatedExercises);
-                    }}
-                  />
-                }
-                label={exercise.name}
-                style={{ margin: 0 }}
-              />
-            </Grid>
+        {resistidoExercises.map(exercise => {
+          const isChecked = Boolean(selected[exercise.value]);
+
+          return (
             <Grid
               item
+              xs={12}
               container
+              alignItems="flex-start"
+              key={exercise.value}
               spacing={1}
-              style={{ marginTop: '8px' }}
             >
-              <Grid
-                item
-                xs
-              >
-                <TextField
-                  {...register(`treinamento_resistido.${exercise.value}.carga`)}
-                  label="Carga"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  style={{ backgroundColor: 'white' }}
-                />
-              </Grid>
               <Grid item>
-                <TextField
-                  {...register(
-                    `treinamento_resistido.${exercise.value}.series_repeticoes`
-                  )}
-                  label="Séries/Repetições"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  style={{ backgroundColor: 'white' }}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={exercise.value}
+                      checked={isChecked}
+                      onChange={e => {
+                        const { checked } = e.target;
+                        const updatedExercises = { ...selected };
+                        if (checked) {
+                          updatedExercises[exercise.value] = {
+                            carga: '',
+                            series_repeticoes: '',
+                          };
+                        } else {
+                          delete updatedExercises[exercise.value];
+                        }
+                        setValue(`treinamento_resistido`, updatedExercises);
+                      }}
+                    />
+                  }
+                  label={exercise.name}
+                  style={{ margin: 0 }}
                 />
               </Grid>
+              {isChecked && ( // Mostra os campos somente se o checkbox estiver marcado
+                <Grid
+                  item
+                  container
+                  spacing={1}
+                  style={{ marginTop: '8px' }}
+                >
+                  <Grid
+                    item
+                    xs
+                  >
+                    <TextField
+                      {...register(
+                        `treinamento_resistido.${exercise.value}.carga`
+                      )}
+                      label="Carga"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      style={{ backgroundColor: 'white' }}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      {...register(
+                        `treinamento_resistido.${exercise.value}.series_repeticoes`
+                      )}
+                      label="Séries/Repetições"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      style={{ backgroundColor: 'white' }}
+                    />
+                  </Grid>
+                </Grid>
+              )}
             </Grid>
-          </Grid>
-        ))}
+          );
+        })}
       </Grid>
     </Box>
   );

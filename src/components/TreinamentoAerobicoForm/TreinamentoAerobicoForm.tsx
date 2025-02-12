@@ -39,7 +39,7 @@ export const TreinamentoAerobicoForm = ({ register, errors }: FormProps) => {
               key={value}
               control={
                 <Radio
-                  {...register('treinamento_aerobico', {
+                  {...register('treinamento_aerobico.tipo', {
                     required: 'Tipo de treinamento é obrigatório',
                   })}
                   value={value}
@@ -48,9 +48,9 @@ export const TreinamentoAerobicoForm = ({ register, errors }: FormProps) => {
               label={name}
             />
           ))}
-          {errors.treinamento_aerobico && (
+          {errors.treinamento_aerobico?.tipo && (
             <Typography color="error">
-              {errors.treinamento_aerobico?.message as string}
+              {errors.treinamento_aerobico.tipo?.message}
             </Typography>
           )}
         </RadioGroup>
@@ -68,29 +68,33 @@ export const TreinamentoAerobicoForm = ({ register, errors }: FormProps) => {
           Intensidade
         </Typography>
         <TextField
-          {...register('intensidade', {
+          {...register('treinamento_aerobico.intensidade', {
             required: 'Intensidade é obrigatória',
           })}
           required={true}
-          error={!!errors.intensidade}
+          error={!!errors.treinamento_aerobico?.intensidade}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
           label="Intensidade"
         />
         <TextField
-          {...register('duracao', { required: 'Duração é obrigatória' })}
+          {...register('treinamento_aerobico.duracao', {
+            required: 'Duração é obrigatória',
+          })}
           required={true}
-          error={!!errors.duracao}
+          error={!!errors.treinamento_aerobico?.duracao}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
           label="Duração"
         />
         <TextField
-          {...register('carga', { required: 'Carga é obrigatória' })}
+          {...register('treinamento_aerobico.carga', {
+            required: 'Carga é obrigatória',
+          })}
           required={true}
-          error={!!errors.carga}
+          error={!!errors.treinamento_aerobico?.carga}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -110,7 +114,7 @@ export const TreinamentoAerobicoForm = ({ register, errors }: FormProps) => {
           Observações (Descrição de circuito funcional ou outro)
         </Typography>
         <TextField
-          {...register('circuito_funcional')}
+          {...register('treinamento_aerobico.circuito_funcional')}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}

@@ -11,8 +11,7 @@ import {
 import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { supabaseClient } from '../../../utils/supabaseClient';
-import { useEffect } from 'react';
+import { useCreate } from '@refinedev/core';
 
 export const PacienteCreate = () => {
   const {
@@ -20,41 +19,37 @@ export const PacienteCreate = () => {
     refineCore: { formLoading },
     formState: { errors },
     register,
-    getValues,
-    setValue,
-  } = useForm({});
+    handleSubmit,
+  } = useForm();
+
+  const { mutate: createPaciente } = useCreate();
 
   const navigate = useNavigate();
 
-  const customSaveButtonProps = {
-    ...saveButtonProps,
-    children: 'Salvar',
-    onClick: async () => {
-      const formData = getValues();
-
-      const { data, error } = await supabaseClient.from('pacientes').insert([
-        {
+  const onSubmit = async (formData: {
+    nome: string;
+    data_nascimento: Date;
+    inicio_atendimento: Date;
+    valor: number;
+    area_atendimento: string;
+  }) => {
+    try {
+      createPaciente({
+        resource: 'pacientes',
+        values: {
           nome: formData.nome,
           data_nascimento: formData.data_nascimento,
           inicio_atendimento: formData.inicio_atendimento,
           valor: formData.valor,
-          fisioterapeuta: formData.fisioterapeuta,
           area_atendimento: formData.area_atendimento,
         },
-      ]);
+      });
 
-      if (error) {
-        console.error('Erro ao enviar dados:', error);
-      } else {
-        console.log('Paciente cadastrado com sucesso:', data);
-        navigate('/pacientes');
-      }
-    },
+      navigate('/pacientes');
+    } catch (error) {
+      console.error('Erro ao cadastrar paciente:', error);
+    }
   };
-
-  useEffect(() => {
-    setValue('area_atendimento', []);
-  }, [setValue]);
 
   const initialFields = [
     { name: 'nome', type: 'text', label: 'Nome Paciente', required: true },
@@ -73,17 +68,14 @@ export const PacienteCreate = () => {
     },
   ];
 
-  const fisioterapeutas = [
-    { name: 'Alisson Alves de Almeida - 296436 - F', value: 'Alisson Alves' },
-    { name: 'Erika Lays Santos de Barros - 285936 - F', value: 'Erika Lays' },
-    { name: 'Rafaela Maria da Silva - 295183 - F', value: 'Rafaela Maria' },
-    { name: 'Wilayane Alves Martins - 295357 - F', value: 'Wilayane Alves' },
-  ];
-
   return (
     <Create
       isLoading={formLoading}
-      saveButtonProps={customSaveButtonProps}
+      saveButtonProps={{
+        ...saveButtonProps,
+        onClick: handleSubmit(onSubmit as any),
+        children: 'Salvar paciente',
+      }}
       title="Criar Paciente"
     >
       <Box
@@ -122,40 +114,6 @@ export const PacienteCreate = () => {
               />
             </Grid>
           ))}
-
-          <Grid
-            item
-            xs={12}
-          >
-            <Typography
-              variant="h6"
-              marginTop={2}
-              fontWeight="bold"
-            >
-              Fisioterapeuta / CREFITO
-            </Typography>
-            <RadioGroup row>
-              {fisioterapeutas.map(({ name, value }) => (
-                <FormControlLabel
-                  key={value}
-                  control={
-                    <Radio
-                      {...register('fisioterapeuta', {
-                        required: 'Selecione um fisioterapeuta',
-                      })}
-                      value={value}
-                    />
-                  }
-                  label={name}
-                />
-              ))}
-            </RadioGroup>
-            {errors.fisioterapeuta && (
-              <FormHelperText error>
-                {errors.fisioterapeuta.message as string}
-              </FormHelperText>
-            )}
-          </Grid>
 
           <Grid
             item

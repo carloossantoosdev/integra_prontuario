@@ -9,10 +9,10 @@ import {
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DateField } from '@refinedev/mui';
 import { supabaseClient } from '../../../utils/supabaseClient';
-import { VitalSigns } from '../../../types/types';
+import { formDataRcpProps } from '../../../types/evolucaoRcpTypes';
 
 export const EvolucaoRcpList = () => {
-  const [vitalsData, setVitalsData] = useState<VitalSigns[]>([]);
+  const [vitalsData, setVitalsData] = useState<formDataRcpProps[]>([]);
   const [patientName, setPatientName] = useState('');
   const [foundPatientName, setFoundPatientName] = useState('');
   const [loading, setLoading] = useState(false);

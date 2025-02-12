@@ -55,6 +55,13 @@ export const SinaisVitaisForm = ({
         container
         spacing={2}
       >
+        <Typography
+          variant="h6"
+          marginTop={2}
+          fontWeight="bold"
+        >
+          Sinais Vitais Inicial
+        </Typography>
         <Grid
           container
           spacing={2}

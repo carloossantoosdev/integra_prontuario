@@ -1,3 +1,4 @@
+import type React from 'react';
 import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlined from '@mui/icons-material/LightModeOutlined';
 import AppBar from '@mui/material/AppBar';
@@ -8,13 +9,10 @@ import {
   HamburgerMenu,
   type RefineThemedLayoutV2HeaderProps,
 } from '@refinedev/mui';
-import type React from 'react';
 import { useContext } from 'react';
 import { ColorModeContext } from '../../contexts/color-mode';
 
-export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
-  sticky = true,
-}) => {
+export const Header = ({ sticky = true }: RefineThemedLayoutV2HeaderProps) => {
   const { mode, setMode } = useContext(ColorModeContext);
 
   return (

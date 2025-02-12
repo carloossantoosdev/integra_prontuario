@@ -12,23 +12,34 @@ import {
   AccordionSummary,
   AccordionDetails,
   TextField,
+  Button,
+  Grid,
 } from '@mui/material';
 import { useShow } from '@refinedev/core';
 import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
 import { useEffect, useState } from 'react';
 import { supabaseClient } from '../../../utils/supabaseClient';
-import { AuscultaPulmonar, Ssvv, VitalSigns } from '../../../types/types';
+import { formDataRcpProps } from '../../../types/evolucaoRcpTypes';
 import { GridExpandMoreIcon } from '@mui/x-data-grid';
+import {
+  renderAuscultaPulmonar,
+  renderDataTable,
+  renderTerapia,
+  renderTreinamento,
+} from './utils/renderHelpers';
+import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 export const PacienteShow = () => {
-  const [vitalsData, setVitalsData] = useState<VitalSigns[]>([]);
+  const [vitalsData, setVitalsData] = useState<formDataRcpProps[]>([]);
   const [loadingVitals, setLoadingVitals] = useState(true);
   const [filterDate, setFilterDate] = useState('');
+  const navigate = useNavigate();
 
   const { query } = useShow({
     meta: {
       select:
-        'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento, fisioterapeuta',
+        'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento',
     },
   });
 
@@ -49,7 +60,7 @@ export const PacienteShow = () => {
         } else {
           setVitalsData(
             vitals.sort(
-              (a: VitalSigns, b: VitalSigns) =>
+              (a: formDataRcpProps, b: formDataRcpProps) =>
                 Number(new Date(b.created_at)) - Number(new Date(a.created_at))
             )
           );
@@ -67,65 +78,10 @@ export const PacienteShow = () => {
 
   const filteredVitalsData = vitalsData.filter(vital =>
     filterDate
-      ? new Date(vital.created_at).toISOString().slice(0, 10) === filterDate
+      ? new Date(vital.data_atendimento).toISOString().slice(0, 10) ===
+        filterDate
       : true
   );
-
-  const renderDataTable = (data: Ssvv) => {
-    if (!data) {
-      return (
-        <TableRow>
-          <TableCell colSpan={2}>Sem dados</TableCell>
-        </TableRow>
-      );
-    }
-
-    return Object.entries(data).map(([key, value]) => (
-      <TableRow key={key}>
-        <TableCell style={{ fontWeight: 600 }}>{key}</TableCell>
-        <TableCell>{value}</TableCell>
-      </TableRow>
-    ));
-  };
-
-  const renderAuscultaPulmonar = (
-    ausculta: AuscultaPulmonar,
-    vital: VitalSigns
-  ) => {
-    if (!ausculta) return null;
-
-    return (
-      <>
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          marginTop={1}
-        >
-          Ausculta Pulmonar -{' '}
-          {new Date(vital.created_at).toLocaleDateString('pt-BR')}
-        </Typography>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableBody>
-              {Object.entries(ausculta).map(([key, value]) => (
-                <TableRow key={key}>
-                  <TableCell style={{ fontWeight: 600 }}>{key}</TableCell>
-                  <TableCell>
-                    {typeof value === 'object'
-                      ? Object.entries(value)
-                          .filter(([, val]) => val === true)
-                          .map(([subKey]) => subKey)
-                          .join(', ') || 'Nenhum'
-                      : value}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </>
-    );
-  };
 
   return (
     <Show
@@ -134,7 +90,9 @@ export const PacienteShow = () => {
       canEdit
       canDelete
       headerButtons={[
-        <EditButton recordItemId={patientsData?.id}>Editar</EditButton>,
+        <EditButton recordItemId={patientsData?.id}>
+          Editar paciente
+        </EditButton>,
         <DeleteButton
           recordItemId={patientsData?.id}
           confirmTitle="Deseja excluir este item?"
@@ -151,7 +109,7 @@ export const PacienteShow = () => {
           fontWeight="bold"
           marginTop={2}
         >
-          Dados Pessoais do Paciente
+          {`Detalhes Paciente: ${patientsData?.nome}`}
         </Typography>
         <TableContainer component={Paper}>
           <Table>
@@ -187,16 +145,6 @@ export const PacienteShow = () => {
                     : 'R$ 0,00'}
                 </TableCell>
               </TableRow>
-              <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>
-                  Fisioterapeuta
-                </TableCell>
-                <TableCell>{patientsData?.fisioterapeuta}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>Observações</TableCell>
-                <TableCell>{patientsData?.area_atendimento}</TableCell>
-              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
@@ -224,8 +172,14 @@ export const PacienteShow = () => {
           >
             <AccordionSummary expandIcon={<GridExpandMoreIcon />}>
               <Typography variant="h6">
-                Evolução -{' '}
-                {new Date(vital.created_at).toLocaleDateString('pt-BR')}
+                {/* <Button
+                  onClick={() => navigate(`/evolucao_rcp/edit/${vital.id}`)}
+                  color="primary"
+                >
+                  Editar
+                </Button> */}
+                {`Evolução ${patientsData?.area_atendimento}`}{' '}
+                {moment(vital.data_atendimento).format('DD/MM/YYYY')}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -234,7 +188,7 @@ export const PacienteShow = () => {
                   variant="subtitle1"
                   fontWeight="bold"
                 >
-                  Sinais vitais inicial
+                  Sinais vitais iniciais
                 </Typography>
                 <TableContainer component={Paper}>
                   <Table>
@@ -246,7 +200,7 @@ export const PacienteShow = () => {
                   variant="subtitle1"
                   fontWeight="bold"
                 >
-                  Sinais vitais final
+                  Sinais vitais finais
                 </Typography>
                 <TableContainer component={Paper}>
                   <Table>
@@ -254,10 +208,55 @@ export const PacienteShow = () => {
                   </Table>
                 </TableContainer>
 
-                {/* Renderizando Ausculta Pulmonar */}
                 {renderAuscultaPulmonar(vital.ausculta_pulmonar, vital)}
+
+                {renderTreinamento(
+                  vital.treinamento_aerobico,
+                  'Treinamento Aeróbico'
+                )}
+
+                {renderTreinamento(
+                  vital.treinamento_resistido,
+                  'Treinamento Resistido'
+                )}
+
+                {renderTreinamento(
+                  vital.treinamento_funcional,
+                  'Treinamento Funcional'
+                )}
+
+                {renderTerapia(vital.tmi, 'TMI')}
+
+                {renderTerapia(vital.terapia_expansao, 'Terapia Expansão')}
+
+                {renderTerapia(
+                  vital.terapia_remo_secrecao,
+                  'Terapia Remoção de Secreção'
+                )}
               </Stack>
             </AccordionDetails>
+
+            <Grid
+              container
+              justifyContent="flex-start"
+              sx={{ padding: 2 }}
+              direction={'column'}
+            >
+              <Typography variant="subtitle1">
+                <strong>Fisioterapeuta</strong>
+                {`: ${vital.fisioterapeuta}`}
+              </Typography>
+
+              <Typography>
+                <strong>Data do Atendimento</strong>
+                {`: ${moment(vital.data_atendimento).format('DD/MM/YYYY')}`}
+              </Typography>
+
+              <Typography variant="subtitle1">
+                <strong>Observações</strong>
+                {`: ${vital.observacao}`}
+              </Typography>
+            </Grid>
           </Accordion>
         ))}
       </Stack>
