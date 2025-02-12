@@ -38,3 +38,4 @@ Para iniciar o servidor de desenvolvimento, utilize o seguinte comando:
 
 ```bash
 yarn dev
+```
