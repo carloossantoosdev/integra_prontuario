@@ -1,7 +1,6 @@
-import { Box, IconButton, Modal as ModalMui, SxProps } from '@mui/material';
+import { Box, IconButton, Modal as ModalMui, SxProps, Typography } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { ReactNode } from 'react';
-import { IconClose } from 'src/icons/IconClose';
-import { Title } from 'src/modules/invoice/components/Title';
 
 import { Container, Content, HeaderModal } from './styles';
 
@@ -37,12 +36,11 @@ export function Modal({
               alignItems: 'center',
             }}
           >
-            <Title
-              sx={{
-                mt: 1,
-              }}
-              label={title}
-            />
+            {title && (
+              <Typography sx={{ mt: 1 }} variant="h6" component="h2">
+                {title}
+              </Typography>
+            )}
             {titleIcon}
           </Box>
           <IconButton
@@ -52,7 +50,7 @@ export function Modal({
             data-testid="close-drawer-icon"
             onClick={onClose}
           >
-            <IconClose size={32} />
+            <CloseIcon fontSize="large" />
           </IconButton>
         </HeaderModal>
 

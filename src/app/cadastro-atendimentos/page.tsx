@@ -1,13 +1,15 @@
 "use client";
 
-import React from 'react';
-import { AppointmentForm } from '@/components/AppointmentForm';
+import React, { Suspense } from 'react';
 import { Box } from '@mui/material';
+import { AppointmentForm } from '@/components/AppointmentForm';
 
 export default function CadastroAtendimento() {
   return (
-    <Box>
-      <AppointmentForm isEditMode={false} /> 
-    </Box>
+    <Suspense fallback={null}>
+      <Box>
+        <AppointmentForm /> 
+      </Box>
+    </Suspense>
   );
 }

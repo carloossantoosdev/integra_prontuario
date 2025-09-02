@@ -1,47 +1,54 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { AppointmentsList } from "@/components/AppointmentList";
 import { Input } from "@/components/Input";
-import { api } from "@/lib/axios";
-import { useAppointmentStore } from "@/store/appointments.store";
-import { AppointmentData } from "@/types/appointment";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState, useCallback } from "react";
 import { debounce } from 'lodash'; 
-import DataGridPagination from "@/components/DataGridPagination"; // Importe o componente de paginação
+import DataGridPagination from "@/components/DataGridPagination"; 
+import { useAppointmentStore } from "@/store/appointments.store";
+import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { appointmentList, setAppointmentList } = useAppointmentStore();
-
   const [loading, setLoading] = useState(true);
-  const [error, ] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [filter, setFilter] = useState<string>(''); 
   const [inputValue, setInputValue] = useState<string>(''); 
 
+  const { appointmentList, setAppointmentList } = useAppointmentStore();
+
+  console.log(appointmentList)
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 3,
     total: 0,
   });
 
+  const router = useRouter();
+
   const fetchAppointments = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get<{ data: AppointmentData[], meta: { total: number } }>('/appointments', {
-        params: {
-          nome: filter,
-          page: pagination.page,
-          limit: pagination.limit,
-        },
-      });
-      setAppointmentList(response.data.data || []);
+      const { data, error, count } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact' })
+        .ilike('nome', `%${filter}%`)
+        .range((pagination.page - 1) * pagination.limit, pagination.page * pagination.limit - 1);
+
+      if (error) throw error;
+
+      console.log('Dados retornados:', data);
+      setAppointmentList(data || []);
       setPagination((prev) => ({
         ...prev,
-        total: response.data.meta.total,
+        total: count || 0,
       }));
     } catch (error) {
       console.error('Erro ao buscar atendimentos:', error);
+      setError('Erro ao buscar atendimentos');
     } finally {
       setLoading(false);
     }
@@ -67,6 +74,9 @@ export default function Home() {
     debouncedSetFilter(event.target.value); 
   };
 
+  const handleEdit = (id: string) => {
+    router.push(`/cadastro-atendimentos?id=${id}`);
+  };
 
   if (loading) return (
     <Box
@@ -116,9 +126,9 @@ export default function Home() {
           mt: 4,
         }}
       >
-    
+  
 
-        <AppointmentsList appointments={appointmentList} />
+        <AppointmentsList appointments={appointmentList} onEdit={handleEdit} />
 
         <Box sx={{ flexGrow: 1 }} />
 

@@ -7,7 +7,7 @@ type AppointmentStore = {
 };
 
 
-export const useAppointmentStore = create<AppointmentStore>((set) => {
+export const useAppointmentStore = create<AppointmentStore>((set,) => {
   return {
     appointmentList: [],
 

@@ -1,118 +1,73 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { Button, Box, Typography, CircularProgress, TextField } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Button, Box, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import { api } from '@/lib/axios';
-import { Input } from './Input';
 import { AppointmentData } from '@/types/appointment';
-import { useRouter } from 'next/navigation';
-import { IconArrowLeft } from '@/icons/IconArrowLeft';
+import { Input } from '@/components/Input';
+import { supabase } from '@/lib/supabaseClient';
+import { useAppointmentStore } from "@/store/appointments.store";
+import { useRouter, useSearchParams } from 'next/navigation';
 
-type AppointmentFormProps = {
-  initialData?: AppointmentData;  
-  isEditMode?: boolean;   
-};
-
-export function AppointmentForm({
-  initialData,
-  isEditMode = false
-}: AppointmentFormProps) {
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm<AppointmentData>({
-    defaultValues: initialData ? { ...initialData, id: initialData.id || '' } : {} 
-  });
-
-  const [loading, setLoading] = useState(false);
+export function AppointmentForm() {
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<AppointmentData>();
+  const { appointmentList } = useAppointmentStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const appointmentId = searchParams?.get('id') ?? null;
 
   useEffect(() => {
-    if (initialData) {
-      Object.keys(initialData).forEach(key => {
-        const typedKey = key as keyof AppointmentData;
-        // Verifique se a chave é uma data e converta se necessário
-        if (typedKey === "data_nascimento" || typedKey === "data_primeiro_atendimento" || typedKey === "data_ultimo_atendimento") {
-          const dateValue = new Date(initialData[typedKey]);
-          if (typedKey === "data_nascimento") {
-            setValue(typedKey, dateValue.toISOString().split('T')[0]); 
-          } else {
-            setValue(typedKey, dateValue.toISOString().slice(0, 16));
-          }
-        } else {
-          setValue(typedKey, initialData[typedKey]);
-        }
-      });
+    if (appointmentId) {
+      const appointment = appointmentList.find(app => app.id === parseInt(appointmentId));
+      if (appointment) {
+        Object.keys(appointment).forEach(key => {
+          setValue(key as keyof AppointmentData, appointment[key as keyof AppointmentData]);
+        });
+      }
     }
-  }, [initialData, setValue]);
+  }, [appointmentId, appointmentList, setValue]);
 
   const onSubmit = async (data: AppointmentData) => {
-    setLoading(true); 
     try {
-      console.log('Dados do formulário:', data);
-      let response;
-      if (isEditMode) {
-        response = await api.put(`/appointments/${data.id}`, data); 
-        console.log('Resposta da API:', response.data);
+      if (appointmentId) {
+        const { error } = await supabase
+          .from('appointments')
+          .update(data)
+          .eq('id', parseInt(appointmentId));
+        if (error) throw error;
+        console.log('Dados atualizados com sucesso!');
       } else {
-        response = await api.post('/appointments', data);
-        console.log('Resposta da API:', response.data);
+        const { error } = await supabase
+          .from('appointments')
+          .insert(data);
+        if (error) throw error;
+        console.log('Dados salvos com sucesso!');
       }
-
-      router.push('/'); 
+      router.push('/');
     } catch (error) {
-      const typedError = error as any;
-      console.error('Erro ao chamar a API:', typedError.response?.data || typedError.message);
-
-    } finally {
-      setLoading(false);
+      console.error('Erro ao salvar os dados:', error);
     }
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ padding: 2 }}>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        <Button
-          onClick={() => router.back()}
-          sx={{
-            p: 0,
-          }}
-        >
-          <IconArrowLeft size={28} />
-        </Button>
-        {isEditMode ? 'Editar Atendimento' : 'Novo Atendimento'}
+        Formulário de Atendimento
       </Typography>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-        {/** Renderização dos campos do formulário */}
         <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
           <Controller
-            name="nome"
+            name="data_atendimento"
             control={control}
             rules={{ required: 'Este campo é obrigatório' }}
             render={({ field }) => (
               <Input
                 {...field}
-                label="Nome"
-                error={!!errors.nome}
-                helperText={errors.nome?.message}
-                sx={{ width: '100%' }}
-              />
-            )}
-          />
-        </Box>
-
-        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
-          <Controller
-            name="data_nascimento"
-            control={control}
-            rules={{ required: 'Este campo é obrigatório' }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                label="Data de Nascimento"
+                label="Data do Atendimento"
                 type="date"
-                error={!!errors.data_nascimento}
-                helperText={errors.data_nascimento?.message}
+                error={!!errors.data_atendimento}
+                helperText={errors.data_atendimento?.message}
                 sx={{ width: '100%' }}
               />
             )}
@@ -121,52 +76,16 @@ export function AppointmentForm({
 
         <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
           <Controller
-            name="data_primeiro_atendimento"
+            name="ssvv_inicial_fc"
             control={control}
             rules={{ required: 'Este campo é obrigatório' }}
             render={({ field }) => (
               <Input
                 {...field}
-                label="Início do Atendimento"
-                type="datetime-local"
-                error={!!errors.data_primeiro_atendimento}
-                helperText={errors.data_primeiro_atendimento?.message}
-                sx={{ width: '100%' }}
-              />
-            )}
-          />
-        </Box>
-
-        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
-          <Controller
-            name="data_ultimo_atendimento"
-            control={control}
-            rules={{ required: 'Este campo é obrigatório' }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                label="Data do Último Atendimento"
-                type="datetime-local"
-                error={!!errors.data_ultimo_atendimento}
-                helperText={errors.data_ultimo_atendimento?.message}
-                sx={{ width: '100%' }}
-              />
-            )}
-          />
-        </Box>
-
-        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
-          <Controller
-            name="valor"
-            control={control}
-            rules={{ required: 'Este campo é obrigatório' }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                label="Valor"
+                label="FC Inicial (bpm)"
                 type="number"
-                error={!!errors.valor}
-                helperText={errors.valor?.message}
+                error={!!errors.ssvv_inicial_fc}
+                helperText={errors.ssvv_inicial_fc?.message}
                 sx={{ width: '100%' }}
               />
             )}
@@ -175,15 +94,16 @@ export function AppointmentForm({
 
         <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
           <Controller
-            name="atendente"
+            name="ssvv_inicial_spo2"
             control={control}
             rules={{ required: 'Este campo é obrigatório' }}
             render={({ field }) => (
               <Input
                 {...field}
-                label="Atendente"
-                error={!!errors.atendente}
-                helperText={errors.atendente?.message}
+                label="SpO2 Inicial (%)"
+                type="number"
+                error={!!errors.ssvv_inicial_spo2}
+                helperText={errors.ssvv_inicial_spo2?.message}
                 sx={{ width: '100%' }}
               />
             )}
@@ -192,57 +112,81 @@ export function AppointmentForm({
 
         <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
           <Controller
-            name="observacoes"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Observações"
-                multiline
-                rows={4}
-                sx={{ width: '100%' }}
-              />
-            )}
-          />
-        </Box>
-
-        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
-          <Controller
-            name="condutas"
+            name="ssvv_inicial_fr"
             control={control}
             rules={{ required: 'Este campo é obrigatório' }}
             render={({ field }) => (
-              <TextField
+              <Input
                 {...field}
-                multiline
-                rows={4}
-                label="Condutas"
-                error={!!errors.condutas}
-                helperText={errors.condutas?.message}
+                label="FR Inicial (ipm)"
+                type="number"
+                error={!!errors.ssvv_inicial_fr}
+                helperText={errors.ssvv_inicial_fr?.message}
                 sx={{ width: '100%' }}
               />
             )}
           />
         </Box>
-      </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-        <Button 
-          type="submit" 
-          variant="contained" 
-          sx={{
-            backgroundColor: '#05662B',
-            textTransform: 'none',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: '#05662B',
-            },
-          }} 
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} /> : (isEditMode ? 'Atualizar' : 'Enviar')} 
-        </Button>
+        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
+          <Controller
+            name="ssvv_inicial_pa"
+            control={control}
+            rules={{ required: 'Este campo é obrigatório' }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="PA Inicial (mmHg)"
+                type="number"
+                error={!!errors.ssvv_inicial_pa}
+                helperText={errors.ssvv_inicial_pa?.message}
+                sx={{ width: '100%' }}
+              />
+            )}
+          />
+        </Box>
+
+        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
+          <Controller
+            name="modo_ventilatorio"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="Modo Ventilatório"
+                error={!!errors.modo_ventilatorio}
+                helperText={errors.modo_ventilatorio?.message}
+                sx={{ width: '100%' }}
+              />
+            )}
+          />
+        </Box>
+
+        <Box sx={{ flex: '1 1 calc(50% - 16px)', minWidth: '200px' }}>
+          <Controller
+            name="ipap"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="IPAP"
+                type="number"
+                error={!!errors.ipap}
+                helperText={errors.ipap?.message}
+                sx={{ width: '100%' }}
+              />
+            )}
+          />
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+          <Button type="submit" variant="contained" color="success">
+            {appointmentId ? 'Atualizar' : 'Salvar'}
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
 }
+
+

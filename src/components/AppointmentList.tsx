@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from 'react';
-import { Box, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import { Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
 import { AppointmentData } from '@/types/appointment';
-import { useRouter } from 'next/navigation';
-import { formatDate, formatTime } from '@/utils/formatedData';
-import { formatCurrency } from '@/utils/formatCurrency';
+import { formatDate } from '@/utils/formatedData';
 
-export function AppointmentsList({ appointments }: { appointments: AppointmentData[] }) {
-  const router = useRouter();
+interface AppointmentsListProps {
+  appointments: AppointmentData[];
+  onEdit: (id: string) => void; // Adicionar a prop onEdit
+}
 
-  const handleEdit = (id: string) => {
-    if (id && id.trim() !== "") { 
-      router.push(`/cadastro-atendimentos/${id}`);
+export function AppointmentsList({ appointments, onEdit }: AppointmentsListProps) {
+  const handleEdit = (id: number | undefined) => {
+    if (id !== undefined && id !== null) {
+      onEdit(id.toString()); // Converter o ID para string antes de chamar onEdit
     } else {
       console.error('ID inválido:', id);
     }
@@ -36,17 +36,17 @@ export function AppointmentsList({ appointments }: { appointments: AppointmentDa
           {appointments.map((appointment) => (
             <TableRow key={appointment.id}>
               <TableCell>{appointment.nome}</TableCell>
-              <TableCell>{formatDate(appointment.data_nascimento)}</TableCell>
-              <TableCell>{formatDate(appointment.data_primeiro_atendimento)} {formatTime(appointment.data_primeiro_atendimento)}</TableCell>
+              <TableCell>{formatDate(appointment.data_atendimento)} {formatDate(appointment.data_atendimento)}</TableCell>
+              {/* <TableCell>{formatDate(appointment.data_primeiro_atendimento)} {formatTime(appointment.data_primeiro_atendimento)}</TableCell>
               <TableCell>{formatDate(appointment.data_ultimo_atendimento)} {formatTime(appointment.data_ultimo_atendimento)}</TableCell>
               <TableCell>
                         {new Intl.NumberFormat('pt-BR', {
                             style: 'currency',
                             currency: 'BRL',
-                        }).format(appointment.valor)}
+                        }).format(Number(appointment.valor))}
               </TableCell>
               <TableCell>{appointment.condutas}</TableCell>
-              <TableCell>{appointment.atendente}</TableCell>
+              <TableCell>{appointment.atendente}</TableCell> */}
               <TableCell>
                 <Button 
                   variant="contained" 
