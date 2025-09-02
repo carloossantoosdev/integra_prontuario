@@ -2,7 +2,7 @@ import React from 'react';
 import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCreate, useOne } from '@refinedev/core';
+import { useCreate, useOne, useNotification } from '@refinedev/core';
 import { SinaisVitaisForm } from '../../../components/SinaisVitaisForm/SinaisVitaisForm';
 import { formDataRcpProps } from '../../../types/evolucaoRcpTypes';
 import { TreinamentoAerobicoForm } from '../../../components/TreinamentoAerobicoForm/TreinamentoAerobicoForm';
@@ -27,7 +27,8 @@ import {
 export const EvolucaoRcpCreate = () => {
   const { pacienteId } = useParams();
   const navigate = useNavigate();
-  const { mutate: createEvolucao } = useCreate();
+  const { mutateAsync: createEvolucao } = useCreate();
+  const { open } = useNotification();
 
   const {
     saveButtonProps,
@@ -83,14 +84,14 @@ export const EvolucaoRcpCreate = () => {
     };
 
     try {
-      createEvolucao({
+      await createEvolucao({
         resource: 'evolucao_rcp',
         values: dataToSend,
       });
-
+      open?.({ type: 'success', message: 'Evolução salva com sucesso' });
       navigate('/pacientes');
-    } catch (error) {
-      console.error('Erro ao cadastrar sinais vitais:', error);
+    } catch (error: any) {
+      open?.({ type: 'error', message: error?.message ?? 'Erro ao salvar evolução' });
     }
   };
 

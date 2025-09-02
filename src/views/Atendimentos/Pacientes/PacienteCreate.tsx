@@ -12,7 +12,7 @@ import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 import { Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useCreate } from '@refinedev/core';
+import { useCreate, useNotification } from '@refinedev/core';
 
 export const PacienteCreate = () => {
   const {
@@ -24,7 +24,8 @@ export const PacienteCreate = () => {
     handleSubmit,
   } = useForm();
 
-  const { mutate: createPaciente } = useCreate();
+  const { mutateAsync: createPaciente } = useCreate();
+  const { open } = useNotification();
 
   const navigate = useNavigate();
 
@@ -36,20 +37,34 @@ export const PacienteCreate = () => {
     area_atendimento: string;
   }) => {
     try {
-      createPaciente({
+      const values = {
+        nome: formData.nome,
+        data_nascimento: formData.data_nascimento
+          ? new Date(formData.data_nascimento).toISOString().split('T')[0]
+          : null,
+        inicio_atendimento: formData.inicio_atendimento
+          ? new Date(formData.inicio_atendimento).toISOString().split('T')[0]
+          : null,
+        valor:
+          formData.valor === undefined || formData.valor === null
+            ? null
+            : Number(formData.valor),
+        area_atendimento: formData.area_atendimento,
+      } as any;
+
+      await createPaciente({
         resource: 'pacientes',
-        values: {
-          nome: formData.nome,
-          data_nascimento: formData.data_nascimento,
-          inicio_atendimento: formData.inicio_atendimento,
-          valor: formData.valor,
-          area_atendimento: formData.area_atendimento,
-        },
+        values,
+      });
+
+      open?.({
+        type: 'success',
+        message: 'Paciente cadastrado com sucesso',
       });
 
       navigate('/pacientes');
-    } catch (error) {
-      console.error('Erro ao cadastrar paciente:', error);
+    } catch (error: any) {
+      open?.({ type: 'error', message: error?.message ?? 'Erro ao cadastrar paciente' });
     }
   };
 
