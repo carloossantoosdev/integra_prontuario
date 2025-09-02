@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
+import { Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useCreate } from '@refinedev/core';
 
@@ -19,6 +20,7 @@ export const PacienteCreate = () => {
     refineCore: { formLoading },
     formState: { errors },
     register,
+    control,
     handleSubmit,
   } = useForm();
 
@@ -99,19 +101,63 @@ export const PacienteCreate = () => {
               xs={6}
               key={name}
             >
-              <TextField
-                {...register(name, {
-                  required: required ? `${label} é obrigatório` : false,
-                })}
-                required={true}
-                type={type}
-                error={!!errors[name]}
-                helperText={errors[name]?.message as string}
-                margin="normal"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                label={label}
-              />
+              {name === 'valor' ? (
+                <Controller
+                  name="valor"
+                  control={control}
+                  rules={{ required: 'Valor é obrigatório' }}
+                  render={({ field }) => {
+                    const formatter = new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    });
+                    const displayValue =
+                      field.value === undefined ||
+                      field.value === null ||
+                      field.value === ''
+                        ? ''
+                        : formatter.format(Number(field.value));
+
+                    const parseBRL = (input: string) => {
+                      const digits = input.replace(/[^\d]/g, '');
+                      if (!digits) return '';
+                      return Number(digits) / 100;
+                    };
+
+                    return (
+                      <TextField
+                        value={displayValue}
+                        onChange={e => {
+                          const num = parseBRL(e.target.value);
+                          field.onChange(num);
+                        }}
+                        required={true}
+                        type="text"
+                        error={!!errors[name]}
+                        helperText={errors[name]?.message as string}
+                        margin="normal"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        label={label}
+                      />
+                    );
+                  }}
+                />
+              ) : (
+                <TextField
+                  {...register(name, {
+                    required: required ? `${label} é obrigatório` : false,
+                  })}
+                  required={true}
+                  type={type}
+                  error={!!errors[name]}
+                  helperText={errors[name]?.message as string}
+                  margin="normal"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  label={label}
+                />
+              )}
             </Grid>
           ))}
 

@@ -1,0 +1,63 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-1aabacf84a0829dd.js",
+      "static/chunks/fd9d1056-c1071877c83ce0a2.js",
+      "static/chunks/23-a4645f5eacfacba9.js",
+      "static/chunks/main-app-6ac9d79cf1511151.js",
+      "static/chunks/app/_not-found/page-735964f6929d0b07.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-1aabacf84a0829dd.js",
+      "static/chunks/fd9d1056-c1071877c83ce0a2.js",
+      "static/chunks/23-a4645f5eacfacba9.js",
+      "static/chunks/main-app-6ac9d79cf1511151.js",
+      "static/css/08642af62822b431.css",
+      "static/chunks/233-aaf50a5083b39ebb.js",
+      "static/chunks/405-fbe81bbb6b1d2c7a.js",
+      "static/chunks/427-736c011fd46a05b6.js",
+      "static/chunks/app/layout-3450de8215665978.js"
+    ],
+    "/AppointmentForm/page": [
+      "static/chunks/webpack-1aabacf84a0829dd.js",
+      "static/chunks/fd9d1056-c1071877c83ce0a2.js",
+      "static/chunks/23-a4645f5eacfacba9.js",
+      "static/chunks/main-app-6ac9d79cf1511151.js",
+      "static/chunks/233-aaf50a5083b39ebb.js",
+      "static/chunks/271-6d12b550c72d49fe.js",
+      "static/chunks/343-2512adf8d3181f38.js",
+      "static/chunks/app/AppointmentForm/page-aa0e053032704e13.js"
+    ],
+    "/cadastro-atendimentos/[id]/page": [
+      "static/chunks/webpack-1aabacf84a0829dd.js",
+      "static/chunks/fd9d1056-c1071877c83ce0a2.js",
+      "static/chunks/23-a4645f5eacfacba9.js",
+      "static/chunks/main-app-6ac9d79cf1511151.js",
+      "static/chunks/233-aaf50a5083b39ebb.js",
+      "static/chunks/271-6d12b550c72d49fe.js",
+      "static/chunks/343-2512adf8d3181f38.js",
+      "static/chunks/app/cadastro-atendimentos/[id]/page-2aa694354fde7746.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-1aabacf84a0829dd.js",
+      "static/chunks/fd9d1056-c1071877c83ce0a2.js",
+      "static/chunks/23-a4645f5eacfacba9.js",
+      "static/chunks/main-app-6ac9d79cf1511151.js",
+      "static/chunks/233-aaf50a5083b39ebb.js",
+      "static/chunks/271-6d12b550c72d49fe.js",
+      "static/chunks/405-fbe81bbb6b1d2c7a.js",
+      "static/chunks/736-c5e2d56f010d58db.js",
+      "static/chunks/app/page-324fb625961d789a.js"
+    ],
+    "/cadastro-atendimentos/page": [
+      "static/chunks/webpack-1aabacf84a0829dd.js",
+      "static/chunks/fd9d1056-c1071877c83ce0a2.js",
+      "static/chunks/23-a4645f5eacfacba9.js",
+      "static/chunks/main-app-6ac9d79cf1511151.js",
+      "static/chunks/233-aaf50a5083b39ebb.js",
+      "static/chunks/271-6d12b550c72d49fe.js",
+      "static/chunks/343-2512adf8d3181f38.js",
+      "static/chunks/app/cadastro-atendimentos/page-9f293eb5de01362a.js"
+    ]
+  }
+}
