@@ -9,12 +9,13 @@ import routerBindings, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
 } from '@refinedev/react-router-v6';
-import { dataProvider, liveProvider } from '@refinedev/supabase';
+// Supabase removido
 import { BrowserRouter } from 'react-router-dom';
 import { ColorModeContextProvider } from './contexts/color-mode';
 import { AppRoutes } from './routes';
-import { supabaseClient } from './utils/supabaseClient';
-import { authProvider } from './utils/authProvider';
+// Supabase removido
+import firestoreDataProvider from './utils/firestoreDataProvider';
+import firebaseAuthProvider from './utils/firebaseAuthProvider';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 export function App() {
@@ -26,9 +27,8 @@ export function App() {
           <GlobalStyles styles={{ html: { WebkitFontSmoothing: 'auto' } }} />
           <RefineSnackbarProvider>
             <Refine
-              dataProvider={dataProvider(supabaseClient)}
-              liveProvider={liveProvider(supabaseClient)}
-              authProvider={authProvider}
+              dataProvider={firestoreDataProvider}
+              authProvider={firebaseAuthProvider}
               routerProvider={routerBindings}
               notificationProvider={{
                 open: ({ key, message, type, description }) => {
@@ -49,6 +49,21 @@ export function App() {
                   meta: {
                     canDelete: true,
                     label: 'Cadastrar Paciente',
+                  },
+                },
+                // KPIs após Cadastrar Paciente no menu
+                {
+                  name: 'kpis_dashboard',
+                  list: '/kpis/dashboard',
+                  meta: {
+                    label: 'KPIs - Dashboard',
+                  },
+                },
+                {
+                  name: 'kpis_form',
+                  list: '/kpis/form',
+                  meta: {
+                    label: 'KPIs - Preenchimento',
                   },
                 },
                 {

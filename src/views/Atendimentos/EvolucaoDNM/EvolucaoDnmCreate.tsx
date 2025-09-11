@@ -2,7 +2,8 @@
 import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabaseClient } from '../../../utils/supabaseClient';
+import { db } from '../../../utils/firebaseClient';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { SinaisVitaisForm } from '../../../components/SinaisVitaisForm/SinaisVitaisForm';
 import { useOne } from '@refinedev/core';
 import { Box, CircularProgress, Typography } from '@mui/material';
@@ -37,20 +38,17 @@ export const EvolucaoDnmCreate = () => {
     onClick: async () => {
       const formData = getValues();
 
-      const { data, error } = await supabaseClient.from('evolucao_dnm').insert([
-        {
+      try {
+        await addDoc(collection(db, 'evolucao_dnm'), {
           patient_id: pacienteId,
           ssvv_inicial: formData.ssvv_inicial,
           ssvv_final: formData.ssvv_final,
           ausculta_pulmonar: formData.ausculta_pulmonar,
-        },
-      ]);
-
-      if (error) {
-        console.error('Erro ao cadastrar sinais vitais:', error);
-      } else {
-        console.log('Sinais vitais cadastrados com sucesso:', data);
+          created_at: serverTimestamp(),
+        });
         navigate('/pacientes');
+      } catch (error) {
+        console.error('Erro ao cadastrar sinais vitais:', error);
       }
     },
   };

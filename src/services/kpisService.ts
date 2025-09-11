@@ -1,43 +1,50 @@
-import { supabaseClient } from '../utils/supabaseClient';
 import type { KpiMonthly, KpiQueryParams, KpiUpsertInput } from '../types/kpis';
+import { db } from '../utils/firebaseClient';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query as fbQuery,
+  setDoc,
+  where as fbWhere,
+  orderBy as fbOrderBy,
+} from 'firebase/firestore';
 
 const TABLE = 'kpis_mensais';
 
 export async function upsertKpiMonthly(input: KpiUpsertInput) {
   const refDate = `${input.refDate}-01`;
-  const payload = {
+  const ref = doc(db, TABLE, refDate);
+  // Garanta que ref_date exista no documento para consultas (orderBy/where)
+  await setDoc(
+    ref,
+    { ref_date: refDate, metrics: input.metrics },
+    { merge: true }
+  );
+  const snap = await getDoc(ref);
+  return {
+    id: snap.id,
     ref_date: refDate,
-    metrics: input.metrics,
-  };
-
-  const { data, error } = await supabaseClient
-    .from(TABLE)
-    .upsert(payload, { onConflict: 'ref_date', ignoreDuplicates: false })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data as KpiMonthly;
+    ...(snap.data() as any),
+  } as KpiMonthly;
 }
 
 export async function getKpis(params: KpiQueryParams = {}) {
-  let query = supabaseClient.from(TABLE).select('*').order('ref_date', {
-    ascending: true,
-  });
-  if (params.from) query = query.gte('ref_date', params.from);
-  if (params.to) query = query.lte('ref_date', params.to);
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return (data ?? []) as KpiMonthly[];
+  const constraints: any[] = [fbOrderBy('ref_date', 'asc')];
+  if (params.from) constraints.push(fbWhere('ref_date', '>=', params.from));
+  if (params.to) constraints.push(fbWhere('ref_date', '<=', params.to));
+  const q = fbQuery(collection(db, TABLE), ...constraints);
+  const snap = await getDocs(q);
+  return snap.docs.map((d: any) => ({
+    id: d.id,
+    ...(d.data() as any),
+  })) as KpiMonthly[];
 }
 
 export async function getKpiByMonth(yearMonth: string) {
-  const { data, error } = await supabaseClient
-    .from(TABLE)
-    .select('*')
-    .eq('ref_date', `${yearMonth}-01`)
-    .single();
-  if (error) return null;
-  return data as KpiMonthly;
+  const ref = doc(db, TABLE, `${yearMonth}-01`);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...(snap.data() as any) } as KpiMonthly;
 }

@@ -18,8 +18,14 @@ import {
 import { useShow } from '@refinedev/core';
 import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
 import { useEffect, useState } from 'react';
-import { supabaseClient } from '../../../utils/supabaseClient';
-import { formDataRcpProps } from '../../../types/evolucaoRcpTypes';
+import { db } from '../../../utils/firebaseClient';
+import {
+  collection,
+  getDocs,
+  query as fbQuery,
+  where,
+} from 'firebase/firestore';
+// Tipagem flexível para suportar RCP e DNM
 import { GridExpandMoreIcon } from '@mui/x-data-grid';
 import {
   renderAuscultaPulmonar,
@@ -31,7 +37,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 export const PacienteShow = () => {
-  const [vitalsData, setVitalsData] = useState<formDataRcpProps[]>([]);
+  const [vitalsData, setVitalsData] = useState<any[]>([]);
   const [loadingVitals, setLoadingVitals] = useState(true);
   const [filterDate, setFilterDate] = useState('');
   const navigate = useNavigate();
@@ -50,20 +56,39 @@ export const PacienteShow = () => {
     const fetchVitals = async () => {
       if (patientsData) {
         setLoadingVitals(true);
-        const { data: vitals, error } = await supabaseClient
-          .from('evolucao_rcp')
-          .select('*')
-          .eq('patient_id', patientsData.id);
+        try {
+          const area = String(
+            patientsData.area_atendimento || ''
+          ).toUpperCase();
+          const collectionName = area.includes('DNM')
+            ? 'evolucao_dnm'
+            : 'evolucao_rcp';
 
-        if (error) {
-          console.error('Erro ao buscar sinais vitais:', error);
-        } else {
-          setVitalsData(
-            vitals.sort(
-              (a: formDataRcpProps, b: formDataRcpProps) =>
-                Number(new Date(b.created_at)) - Number(new Date(a.created_at))
-            )
+          const q = fbQuery(
+            collection(db, collectionName),
+            where('patient_id', '==', patientsData.id)
           );
+          const snap = await getDocs(q);
+          const vitals = snap.docs.map(d => ({
+            id: d.id,
+            ...(d.data() as any),
+          }));
+
+          const getRecordDate = (rec: any) => {
+            const raw = rec?.data_atendimento ?? rec?.created_at;
+            if (!raw) return new Date(0);
+            // Firestore Timestamp possui toDate
+            if (typeof raw?.toDate === 'function') return raw.toDate();
+            return new Date(raw);
+          };
+
+          setVitalsData(
+            vitals.sort((a: any, b: any) => {
+              return Number(getRecordDate(b)) - Number(getRecordDate(a));
+            })
+          );
+        } catch (error) {
+          console.error('Erro ao buscar sinais vitais:', error);
         }
         setLoadingVitals(false);
       }
@@ -76,12 +101,21 @@ export const PacienteShow = () => {
     return <CircularProgress />;
   }
 
-  const filteredVitalsData = vitalsData.filter(vital =>
-    filterDate
-      ? new Date(vital.data_atendimento).toISOString().slice(0, 10) ===
-        filterDate
-      : true
-  );
+  const getRecordDate = (rec: any) => {
+    const raw = rec?.data_atendimento ?? rec?.created_at;
+    if (!raw) return new Date(0);
+    if (typeof raw?.toDate === 'function') return raw.toDate();
+    return new Date(raw);
+  };
+
+  const filteredVitalsData = vitalsData.filter(vital => {
+    if (!filterDate) return true;
+    try {
+      return getRecordDate(vital).toISOString().slice(0, 10) === filterDate;
+    } catch {
+      return false;
+    }
+  });
 
   return (
     <Show
@@ -179,7 +213,7 @@ export const PacienteShow = () => {
                   Editar
                 </Button> */}
                 {`Evolução ${patientsData?.area_atendimento}`}{' '}
-                {moment(vital.data_atendimento).format('DD/MM/YYYY')}
+                {moment(getRecordDate(vital)).format('DD/MM/YYYY')}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -249,13 +283,15 @@ export const PacienteShow = () => {
 
               <Typography>
                 <strong>Data do Atendimento</strong>
-                {`: ${moment(vital.data_atendimento).format('DD/MM/YYYY')}`}
+                {`: ${moment(getRecordDate(vital)).format('DD/MM/YYYY')}`}
               </Typography>
 
-              <Typography variant="subtitle1">
-                <strong>Observações</strong>
-                {`: ${vital.observacao}`}
-              </Typography>
+              {vital?.observacao ? (
+                <Typography variant="subtitle1">
+                  <strong>Observações</strong>
+                  {`: ${vital.observacao}`}
+                </Typography>
+              ) : null}
             </Grid>
           </Accordion>
         ))}

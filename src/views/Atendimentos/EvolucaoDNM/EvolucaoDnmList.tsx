@@ -8,7 +8,16 @@ import {
 } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DateField } from '@refinedev/mui';
-import { supabaseClient } from '../../../utils/supabaseClient';
+import { db } from '../../../utils/firebaseClient';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  startAt,
+  endAt,
+  where,
+} from 'firebase/firestore';
 import { formDataRcpProps } from '../../../types/evolucaoRcpTypes';
 
 export const EvolucaoDnmList = () => {
@@ -21,31 +30,34 @@ export const EvolucaoDnmList = () => {
     setLoading(true);
     setFoundPatientName('');
 
-    const { data: patients, error } = await supabaseClient
-      .from('pacientes')
-      .select('*')
-      .ilike('nome', `%${patientName}%`);
-
-    if (error) {
-      console.error('Erro ao buscar pacientes:', error);
-      setLoading(false);
-      return;
-    }
-
-    if (patients.length > 0) {
-      const patientIds = patients.map(patient => patient.id);
-      setFoundPatientName(patients[0].nome);
-      const { data: vitals, error: vitalsError } = await supabaseClient
-        .from('evolucao_dnm')
-        .select('*')
-        .in('patient_id', patientIds);
-
-      if (vitalsError) {
-        console.error('Erro ao buscar sinais vitais:', vitalsError);
+    try {
+      const patientsQ = query(
+        collection(db, 'pacientes'),
+        orderBy('nome'),
+        startAt(patientName),
+        endAt(`${patientName}\uf8ff`)
+      );
+      const patientsSnap = await getDocs(patientsQ);
+      const patients = patientsSnap.docs.map(d => ({
+        id: d.id,
+        ...(d.data() as any),
+      }));
+      if (patients.length > 0) {
+        const first = patients[0];
+        setFoundPatientName(first.nome);
+        const vitalsQ = query(
+          collection(db, 'evolucao_dnm'),
+          where('patient_id', '==', first.id)
+        );
+        const vitalsSnap = await getDocs(vitalsQ);
+        setVitalsData(
+          vitalsSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) }))
+        );
       } else {
-        setVitalsData(vitals);
+        setVitalsData([]);
       }
-    } else {
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
       setVitalsData([]);
     }
     setLoading(false);

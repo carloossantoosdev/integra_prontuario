@@ -15,6 +15,8 @@ import { PacienteShow } from './views/Atendimentos/Pacientes/PacienteShow';
 import { PacienteCreate } from './views/Atendimentos/Pacientes/PacienteCreate';
 import { EvolucaoEdit } from './views/Atendimentos/EvolucaoRCP/EvolucaoEdit';
 import { Login } from './views/Auth/Login';
+import { KpisDashboardPage } from './views/Kpis/KpisDashboardPage';
+import { KpisFormPage } from './views/Kpis/KpisFormPage';
 
 export const AppRoutes = () => {
   return (
@@ -75,6 +77,16 @@ export const AppRoutes = () => {
         <Route
           path="/evolucao_dnm"
           element={<EvolucaoDnmList />}
+        />
+
+        {/* KPIs */}
+        <Route
+          path="/kpis/dashboard"
+          element={<KpisDashboardPage />}
+        />
+        <Route
+          path="/kpis/form"
+          element={<KpisFormPage />}
         />
 
         <Route
