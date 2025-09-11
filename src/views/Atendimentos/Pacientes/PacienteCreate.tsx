@@ -64,7 +64,10 @@ export const PacienteCreate = () => {
 
       navigate('/pacientes');
     } catch (error: any) {
-      open?.({ type: 'error', message: error?.message ?? 'Erro ao cadastrar paciente' });
+      open?.({
+        type: 'error',
+        message: error?.message ?? 'Erro ao cadastrar paciente',
+      });
     }
   };
 
@@ -187,23 +190,25 @@ export const PacienteCreate = () => {
             >
               Área de Atendimento
             </Typography>
-            <RadioGroup
-              defaultValue=""
-              {...register('area_atendimento', {
-                required: 'Selecione uma área de atendimento',
-              })}
-            >
-              <FormControlLabel
-                value="RCP"
-                control={<Radio />}
-                label="RCP"
-              />
-              <FormControlLabel
-                value="DNM"
-                control={<Radio />}
-                label="DNM"
-              />
-            </RadioGroup>
+            <Controller
+              name="area_atendimento"
+              control={control}
+              rules={{ required: 'Selecione uma área de atendimento' }}
+              render={({ field }) => (
+                <RadioGroup {...field}>
+                  <FormControlLabel
+                    value="RCP"
+                    control={<Radio />}
+                    label="RCP"
+                  />
+                  <FormControlLabel
+                    value="DNM"
+                    control={<Radio />}
+                    label="DNM"
+                  />
+                </RadioGroup>
+              )}
+            />
             {errors.area_atendimento && (
               <FormHelperText error>
                 {errors.area_atendimento.message as string}
