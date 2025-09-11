@@ -2,6 +2,7 @@ import React from 'react';
 import { ThemedLayoutV2 } from '@refinedev/mui';
 import { ErrorComponent } from '@refinedev/mui';
 import { Outlet, Route, Routes } from 'react-router-dom';
+import { Authenticated } from '@refinedev/core';
 import { Header } from './components';
 import { Home } from './views/Home/home';
 import { EvolucaoRcpCreate } from './views/Atendimentos/EvolucaoRCP/EvolucaoRcpCreate';
@@ -13,10 +14,16 @@ import { PacienteEdit } from './views/Atendimentos/Pacientes/PacienteEdit';
 import { PacienteShow } from './views/Atendimentos/Pacientes/PacienteShow';
 import { PacienteCreate } from './views/Atendimentos/Pacientes/PacienteCreate';
 import { EvolucaoEdit } from './views/Atendimentos/EvolucaoRCP/EvolucaoEdit';
+import { Login } from './views/Auth/Login';
 
 export const AppRoutes = () => {
   return (
     <Routes>
+      <Route
+        path="/login"
+        element={<Login />}
+      />
+
       <Route
         element={
           <ThemedLayoutV2 Header={Header}>

@@ -14,6 +14,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ColorModeContextProvider } from './contexts/color-mode';
 import { AppRoutes } from './routes';
 import { supabaseClient } from './utils/supabaseClient';
+import { authProvider } from './utils/authProvider';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 export function App() {
@@ -27,7 +28,17 @@ export function App() {
             <Refine
               dataProvider={dataProvider(supabaseClient)}
               liveProvider={liveProvider(supabaseClient)}
+              authProvider={authProvider}
               routerProvider={routerBindings}
+              notificationProvider={{
+                open: ({ key, message, type, description }) => {
+                  // RefineSnackbarProvider já provê UI, apenas mapeamos tipos
+                  // A própria lib intercepta via useNotification, então podemos manter vazio
+                },
+                close: (key?: string) => {
+                  // noop
+                },
+              }}
               resources={[
                 {
                   name: 'pacientes',
