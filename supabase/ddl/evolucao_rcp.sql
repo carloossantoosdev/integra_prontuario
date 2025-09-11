@@ -41,6 +41,11 @@ drop policy if exists "evolucao_rcp_read" on public.evolucao_rcp;
 create policy "evolucao_rcp_read" on public.evolucao_rcp
 for select using (auth.role() = 'authenticated');
 
+-- Leitura pública (ANON) para ambiente de desenvolvimento/visualização
+drop policy if exists "evolucao_rcp_read_anon" on public.evolucao_rcp;
+create policy "evolucao_rcp_read_anon" on public.evolucao_rcp
+for select using (auth.role() = 'anon');
+
 drop policy if exists "evolucao_rcp_write" on public.evolucao_rcp;
 create policy "evolucao_rcp_write" on public.evolucao_rcp
 for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

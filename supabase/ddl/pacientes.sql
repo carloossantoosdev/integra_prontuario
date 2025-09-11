@@ -30,6 +30,11 @@ drop policy if exists "pacientes_read" on public.pacientes;
 create policy "pacientes_read" on public.pacientes
 for select using (auth.role() = 'authenticated');
 
+-- Leitura pública (ANON) para ambiente de desenvolvimento/visualização
+drop policy if exists "pacientes_read_anon" on public.pacientes;
+create policy "pacientes_read_anon" on public.pacientes
+for select using (auth.role() = 'anon');
+
 drop policy if exists "pacientes_write" on public.pacientes;
 create policy "pacientes_write" on public.pacientes
 for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

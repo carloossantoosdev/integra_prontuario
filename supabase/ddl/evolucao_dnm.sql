@@ -32,6 +32,11 @@ drop policy if exists "evolucao_dnm_read" on public.evolucao_dnm;
 create policy "evolucao_dnm_read" on public.evolucao_dnm
 for select using (auth.role() = 'authenticated');
 
+-- Leitura pública (ANON) para ambiente de desenvolvimento/visualização
+drop policy if exists "evolucao_dnm_read_anon" on public.evolucao_dnm;
+create policy "evolucao_dnm_read_anon" on public.evolucao_dnm
+for select using (auth.role() = 'anon');
+
 drop policy if exists "evolucao_dnm_write" on public.evolucao_dnm;
 create policy "evolucao_dnm_write" on public.evolucao_dnm
 for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

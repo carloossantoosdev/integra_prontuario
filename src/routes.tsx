@@ -26,11 +26,9 @@ export const AppRoutes = () => {
 
       <Route
         element={
-          <Authenticated key="protected-routes">
-            <ThemedLayoutV2 Header={Header}>
-              <Outlet />
-            </ThemedLayoutV2>
-          </Authenticated>
+          <ThemedLayoutV2 Header={Header}>
+            <Outlet />
+          </ThemedLayoutV2>
         }
       >
         <Route
