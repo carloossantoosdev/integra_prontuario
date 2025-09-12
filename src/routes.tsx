@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemedLayoutV2 } from '@refinedev/mui';
 import { ErrorComponent } from '@refinedev/mui';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes, Navigate } from 'react-router-dom';
 import { Authenticated } from '@refinedev/core';
 import { Header } from './components';
 import { Home } from './views/Home/home';
@@ -28,9 +28,20 @@ export const AppRoutes = () => {
 
       <Route
         element={
-          <ThemedLayoutV2 Header={Header}>
-            <Outlet />
-          </ThemedLayoutV2>
+          <Authenticated
+            key="auth-guard"
+            v3LegacyAuthProviderCompatible
+            fallback={
+              <Navigate
+                to="/login"
+                replace
+              />
+            }
+          >
+            <ThemedLayoutV2 Header={Header}>
+              <Outlet />
+            </ThemedLayoutV2>
+          </Authenticated>
         }
       >
         <Route

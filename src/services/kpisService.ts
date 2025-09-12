@@ -19,7 +19,11 @@ export async function upsertKpiMonthly(input: KpiUpsertInput) {
   // Garanta que ref_date exista no documento para consultas (orderBy/where)
   await setDoc(
     ref,
-    { ref_date: refDate, metrics: input.metrics },
+    {
+      ref_date: refDate,
+      metrics: input.metrics,
+      targets: input.targets ?? null,
+    },
     { merge: true }
   );
   const snap = await getDoc(ref);

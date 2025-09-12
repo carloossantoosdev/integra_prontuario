@@ -1,6 +1,8 @@
 import type { AuthBindings } from '@refinedev/core';
 import {
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
   type User,
@@ -8,16 +10,19 @@ import {
 import { auth } from './firebaseClient';
 
 export const firebaseAuthProvider: AuthBindings = {
-  login: async ({ email, password }) => {
+  login: async ({ email, password, provider, providerName }) => {
     try {
-      if (!email || !password) {
-        return {
-          success: false,
-          error: new Error('E-mail e senha são obrigatórios'),
-        };
+      const prov = provider || providerName;
+      if (prov === 'google') {
+        const google = new GoogleAuthProvider();
+        await signInWithPopup(auth, google);
+        return { success: true, redirectTo: '/' };
       }
-      await signInWithEmailAndPassword(auth, email, password);
-      return { success: true, redirectTo: '/' };
+      // Desabilitado login por e-mail/senha
+      return {
+        success: false,
+        error: new Error('Login disponível apenas com Google'),
+      };
     } catch (e: unknown) {
       return { success: false, error: e as Error };
     }
