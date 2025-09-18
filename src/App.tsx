@@ -52,20 +52,20 @@ export function App() {
                   },
                 },
                 // KPIs após Cadastrar Paciente no menu
-                {
-                  name: 'kpis_dashboard',
-                  list: '/kpis/dashboard',
-                  meta: {
-                    label: 'KPIs - Dashboard',
-                  },
-                },
-                {
-                  name: 'kpis_form',
-                  list: '/kpis/form',
-                  meta: {
-                    label: 'KPIs - Preenchimento',
-                  },
-                },
+                // {
+                //   name: 'kpis_dashboard',
+                //   list: '/kpis/dashboard',
+                //   meta: {
+                //     label: 'KPIs - Dashboard',
+                //   },
+                // },
+                // {
+                //   name: 'kpis_form',
+                //   list: '/kpis/form',
+                //   meta: {
+                //     label: 'KPIs - Preenchimento',
+                //   },
+                // },
                 {
                   name: 'evolucao_rcp',
                   // list: '/evolucao_rcp',
