@@ -14,8 +14,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { ColorModeContextProvider } from './contexts/color-mode';
 import { AppRoutes } from './routes';
 // Supabase removido
-import firestoreDataProvider from './utils/firestoreDataProvider';
-import firebaseAuthProvider from './utils/firebaseAuthProvider';
+import pocketbaseDataProvider from './utils/pocketbaseDataProvider';
+import pocketbaseAuthProvider from './utils/pocketbaseAuthProvider';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 export function App() {
@@ -27,8 +27,8 @@ export function App() {
           <GlobalStyles styles={{ html: { WebkitFontSmoothing: 'auto' } }} />
           <RefineSnackbarProvider>
             <Refine
-              dataProvider={firestoreDataProvider}
-              authProvider={firebaseAuthProvider}
+              dataProvider={pocketbaseDataProvider}
+              authProvider={pocketbaseAuthProvider}
               routerProvider={routerBindings}
               notificationProvider={{
                 open: ({ key, message, type, description }) => {

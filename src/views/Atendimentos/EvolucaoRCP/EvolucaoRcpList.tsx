@@ -8,16 +8,7 @@ import {
 } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DateField } from '@refinedev/mui';
-import { db } from '../../../utils/firebaseClient';
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  startAt,
-  endAt,
-  where,
-} from 'firebase/firestore';
+import { pocketbaseClient } from '../../../utils/pocketbaseClient';
 import { formDataRcpProps } from '../../../types/evolucaoRcpTypes';
 
 export const EvolucaoRcpList = () => {
@@ -31,27 +22,27 @@ export const EvolucaoRcpList = () => {
     setFoundPatientName('');
 
     try {
-      const patientsQ = query(
-        collection(db, 'pacientes'),
-        orderBy('nome'),
-        startAt(patientName),
-        endAt(`${patientName}\uf8ff`)
-      );
-      const patientsSnap = await getDocs(patientsQ);
-      const patients = patientsSnap.docs.map(d => ({
-        id: d.id,
-        ...(d.data() as any),
-      }));
-      if (patients.length > 0) {
-        const first = patients[0];
+      // Buscar pacientes pelo nome usando PocketBase
+      const patientsResult = await pocketbaseClient
+        .collection('pacientes')
+        .getList(1, 10, {
+          filter: `nome ~ "${patientName}"`,
+          sort: 'nome',
+        });
+
+      if (patientsResult.items.length > 0) {
+        const first = patientsResult.items[0];
         setFoundPatientName(first.nome);
-        const vitalsQ = query(
-          collection(db, 'evolucao_rcp'),
-          where('patient_id', '==', first.id)
-        );
-        const vitalsSnap = await getDocs(vitalsQ);
+
+        // Buscar evoluções RCP do paciente
+        const vitalsResult = await pocketbaseClient
+          .collection('evolucao_rcp')
+          .getList(1, 50, {
+            filter: `patient_id = "${first.id}"`,
+          });
+
         setVitalsData(
-          vitalsSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) }))
+          vitalsResult.items.map(d => ({ id: d.id, ...(d as any) }))
         );
       } else {
         setVitalsData([]);

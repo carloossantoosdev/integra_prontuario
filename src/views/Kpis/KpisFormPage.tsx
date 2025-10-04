@@ -10,7 +10,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { upsertKpiMonthly, getKpiByMonth } from '../../services/kpisService';
+import {
+  upsertKpiMonthly,
+  getKpiByMonth,
+} from '../../services/pocketbaseKpisService';
 import type { KpiMetrics, KpiTargets } from '../../types/kpis';
 
 type FormValues = {

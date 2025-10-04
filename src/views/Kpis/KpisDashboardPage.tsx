@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { getKpis } from '../../services/kpisService';
+import { getKpis } from '../../services/pocketbaseKpisService';
 import type { KpiMonthly } from '../../types/kpis';
 import { computeTickets } from '../../types/kpis';
 import {

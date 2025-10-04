@@ -18,13 +18,7 @@ import {
 import { useShow } from '@refinedev/core';
 import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
 import { useEffect, useState } from 'react';
-import { db } from '../../../utils/firebaseClient';
-import {
-  collection,
-  getDocs,
-  query as fbQuery,
-  where,
-} from 'firebase/firestore';
+import { pocketbaseClient } from '../../../utils/pocketbaseClient';
 // Tipagem flexível para suportar RCP e DNM
 import { GridExpandMoreIcon } from '@mui/x-data-grid';
 import {
@@ -64,14 +58,15 @@ export const PacienteShow = () => {
             ? 'evolucao_dnm'
             : 'evolucao_rcp';
 
-          const q = fbQuery(
-            collection(db, collectionName),
-            where('patient_id', '==', patientsData.id)
-          );
-          const snap = await getDocs(q);
-          const vitals = snap.docs.map(d => ({
+          const vitalsResult = await pocketbaseClient
+            .collection(collectionName)
+            .getList(1, 50, {
+              filter: `patient_id = "${patientsData.id}"`,
+            });
+
+          const vitals = vitalsResult.items.map((d: any) => ({
             id: d.id,
-            ...(d.data() as any),
+            ...d,
           }));
 
           const getRecordDate = (rec: any) => {

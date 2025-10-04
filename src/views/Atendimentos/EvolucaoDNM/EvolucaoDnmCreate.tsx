@@ -2,8 +2,7 @@
 import { Create } from '@refinedev/mui';
 import { useForm } from '@refinedev/react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { db } from '../../../utils/firebaseClient';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { pocketbaseClient } from '../../../utils/pocketbaseClient';
 import { SinaisVitaisForm } from '../../../components/SinaisVitaisForm/SinaisVitaisForm';
 import { useOne } from '@refinedev/core';
 import { Box, CircularProgress, Typography } from '@mui/material';
@@ -39,12 +38,11 @@ export const EvolucaoDnmCreate = () => {
       const formData = getValues();
 
       try {
-        await addDoc(collection(db, 'evolucao_dnm'), {
+        await pocketbaseClient.collection('evolucao_dnm').create({
           patient_id: pacienteId,
           ssvv_inicial: formData.ssvv_inicial,
           ssvv_final: formData.ssvv_final,
           ausculta_pulmonar: formData.ausculta_pulmonar,
-          created_at: serverTimestamp(),
         });
         navigate('/pacientes');
       } catch (error) {
