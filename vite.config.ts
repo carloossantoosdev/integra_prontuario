@@ -1,13 +1,21 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig, loadEnv } from 'vite';
+import * as path from 'path';
+import { defineConfig } from 'vite';
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), 'VITE_');
-  const supabaseUrl = (
-    env.VITE_SUPABASE_URL || 'https://example.supabase.co'
-  ).replace(/\/$/, '');
-
-  return {
-    plugins: [react()],
-  };
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  server: {
+    fs: {
+      // Permitir servir arquivos fora da raiz
+      strict: false,
+    },
+  },
+  optimizeDeps: {
+    exclude: ['pocketbase'],
+  },
 });

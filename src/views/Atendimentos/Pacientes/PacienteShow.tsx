@@ -1,59 +1,59 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { Edit, Trash2, Loader2 } from 'lucide-react';
+import { PageHeader } from '@/components/crud/PageHeader';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
-  CircularProgress,
   Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  TextField,
-  Button,
-  Grid,
-} from '@mui/material';
-import { useShow } from '@refinedev/core';
-import { DateField, Show, EditButton, DeleteButton } from '@refinedev/mui';
-import { useEffect, useState } from 'react';
-import { pocketbaseClient } from '../../../utils/pocketbaseClient';
-// Tipagem flexível para suportar RCP e DNM
-import { GridExpandMoreIcon } from '@mui/x-data-grid';
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import {
-  renderAuscultaPulmonar,
-  renderDataTable,
-  renderTerapia,
-  renderTreinamento,
-} from './utils/renderHelpers';
-import { useNavigate } from 'react-router-dom';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useOne } from '@/hooks/usePocketbaseQuery';
+import { useDelete } from '@/hooks/usePocketbaseMutation';
+import { pocketbaseClient } from '@/utils/pocketbaseClient';
 import moment from 'moment';
 
 export const PacienteShow = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [vitalsData, setVitalsData] = useState<any[]>([]);
   const [loadingVitals, setLoadingVitals] = useState(true);
   const [filterDate, setFilterDate] = useState('');
-  const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { query } = useShow({
-    meta: {
-      select:
-        'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento',
+  const { data: paciente, isLoading } = useOne<any>('pacientes', id);
+
+  const deleteMutation = useDelete({
+    resource: 'pacientes',
+    mutationOptions: {
+      onSuccess: () => {
+        navigate('/pacientes');
+      },
     },
   });
 
-  const { data, isLoading } = query;
-  const patientsData = data?.data;
-
   useEffect(() => {
     const fetchVitals = async () => {
-      if (patientsData) {
+      if (paciente?.id) {
         setLoadingVitals(true);
         try {
-          const area = String(
-            patientsData.area_atendimento || ''
-          ).toUpperCase();
+          const area = String(paciente.area_atendimento || '').toUpperCase();
           const collectionName = area.includes('DNM')
             ? 'evolucao_dnm'
             : 'evolucao_rcp';
@@ -61,236 +61,426 @@ export const PacienteShow = () => {
           const vitalsResult = await pocketbaseClient
             .collection(collectionName)
             .getList(1, 50, {
-              filter: `patient_id = "${patientsData.id}"`,
+              filter: `patient_id="${paciente.id}"`,
+              sort: '-data_atendimento',
             });
 
-          const vitals = vitalsResult.items.map((d: any) => ({
-            id: d.id,
-            ...d,
-          }));
-
-          const getRecordDate = (rec: any) => {
-            const raw = rec?.data_atendimento ?? rec?.created_at;
-            if (!raw) return new Date(0);
-            // Firestore Timestamp possui toDate
-            if (typeof raw?.toDate === 'function') return raw.toDate();
-            return new Date(raw);
-          };
-
-          setVitalsData(
-            vitals.sort((a: any, b: any) => {
-              return Number(getRecordDate(b)) - Number(getRecordDate(a));
-            })
-          );
+          setVitalsData(vitalsResult.items);
         } catch (error) {
-          console.error('Erro ao buscar sinais vitais:', error);
+          console.error('Erro ao buscar evoluções:', error);
+          setVitalsData([]);
         }
         setLoadingVitals(false);
       }
     };
 
     fetchVitals();
-  }, [patientsData]);
-
-  if (isLoading || loadingVitals) {
-    return <CircularProgress />;
-  }
-
-  const getRecordDate = (rec: any) => {
-    const raw = rec?.data_atendimento ?? rec?.created_at;
-    if (!raw) return new Date(0);
-    if (typeof raw?.toDate === 'function') return raw.toDate();
-    return new Date(raw);
-  };
+  }, [paciente]);
 
   const filteredVitalsData = vitalsData.filter(vital => {
     if (!filterDate) return true;
     try {
-      return getRecordDate(vital).toISOString().slice(0, 10) === filterDate;
+      const vitalDate = vital?.data_atendimento || vital?.created;
+      return new Date(vitalDate).toISOString().slice(0, 10) === filterDate;
     } catch {
       return false;
     }
   });
 
+  const formatFieldName = (key: string): string => {
+    if (key === 'series_repeticoes') return 'Séries/Repetições';
+    if (key === 'carga') return 'Carga';
+    return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+  };
+
+  const renderValue = (value: any): React.ReactNode => {
+    if (value === null || value === undefined) return '-';
+    if (typeof value === 'object') {
+      // Se for um objeto, renderizar suas propriedades formatadas
+      const entries = Object.entries(value)
+        .filter(([_, v]) => v !== false && v !== null && v !== undefined && v !== '');
+      
+      if (entries.length === 0) return '-';
+      
+      return (
+        <div className="space-y-1">
+          {entries.map(([k, v], index) => (
+            <div key={k}>
+              <span className="font-semibold">{formatFieldName(k)}:</span>{' '}
+              <span>{String(v)}</span>
+              {index < entries.length - 1 && <span className="text-muted-foreground"> • </span>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return String(value);
+  };
+
+  const renderDataTable = (data: any) => {
+    if (!data || typeof data !== 'object') return null;
+
+    return Object.entries(data).map(([key, value]) => (
+      <TableRow key={key}>
+        <TableCell className="font-medium capitalize">
+          {formatFieldName(key)}
+        </TableCell>
+        <TableCell>{renderValue(value)}</TableCell>
+      </TableRow>
+    ));
+  };
+
+  if (isLoading || loadingVitals) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!paciente) {
+    return (
+      <div>
+        <PageHeader
+          title="Paciente não encontrado"
+          showBackButton
+        />
+        <p>O paciente solicitado não foi encontrado.</p>
+      </div>
+    );
+  }
+
   return (
-    <Show
-      isLoading={isLoading}
-      title="Detalhes Evolução"
-      canEdit
-      canDelete
-      headerButtons={[
-        <EditButton recordItemId={patientsData?.id}>
-          Editar paciente
-        </EditButton>,
-        <DeleteButton
-          recordItemId={patientsData?.id}
-          confirmTitle="Deseja excluir este item?"
-          confirmCancelText="Cancelar"
-          confirmOkText="Excluir"
-        >
-          Excluir
-        </DeleteButton>,
-      ]}
-    >
-      <Stack gap={2}>
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          marginTop={2}
-        >
-          {`Detalhes Paciente: ${patientsData?.nome}`}
-        </Typography>
-        <TableContainer component={Paper}>
+    <div className="space-y-6">
+      <PageHeader
+        title={`Detalhes: ${paciente.nome}`}
+        showBackButton
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/pacientes/edit/${id}`)}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => setDeleteId(id!)}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Excluir
+            </Button>
+          </div>
+        }
+      />
+
+      {/* Dados do Paciente */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Informações do Paciente</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Table>
             <TableBody>
               <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>Nome</TableCell>
-                <TableCell>{patientsData?.nome}</TableCell>
+                <TableCell className="font-medium">Nome</TableCell>
+                <TableCell>{paciente.nome}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>
+                <TableCell className="font-medium">
                   Data de Nascimento
                 </TableCell>
                 <TableCell>
-                  <DateField value={patientsData?.data_nascimento} />
+                  {paciente.data_nascimento
+                    ? format(new Date(paciente.data_nascimento), 'dd/MM/yyyy')
+                    : '-'}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>
+                <TableCell className="font-medium">
                   Início do Atendimento
                 </TableCell>
                 <TableCell>
-                  <DateField value={patientsData?.inicio_atendimento} />
+                  {paciente.inicio_atendimento
+                    ? format(
+                        new Date(paciente.inicio_atendimento),
+                        'dd/MM/yyyy'
+                      )
+                    : '-'}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>Valor</TableCell>
+                <TableCell className="font-medium">Valor</TableCell>
                 <TableCell>
-                  {patientsData?.valor
-                    ? `R$ ${patientsData?.valor.toLocaleString('pt-BR', {
+                  {paciente.valor
+                    ? `R$ ${paciente.valor.toLocaleString('pt-BR', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}`
                     : 'R$ 0,00'}
                 </TableCell>
               </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">
+                  Área de Atendimento
+                </TableCell>
+                <TableCell>{paciente.area_atendimento}</TableCell>
+              </TableRow>
             </TableBody>
           </Table>
-        </TableContainer>
+        </CardContent>
+      </Card>
 
-        <TextField
-          type="date"
-          variant="outlined"
-          label="Filtrar por Data"
-          onChange={e => setFilterDate(e.target.value)}
-          sx={{
-            marginTop: 5,
-          }}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          InputProps={{
-            style: { marginTop: 10, marginBottom: 16 },
-          }}
-        />
-
-        {filteredVitalsData.map(vital => (
-          <Accordion
-            key={vital.id}
-            style={{ marginBottom: '20px' }}
+      {/* Filtro de Data */}
+      <div className="flex items-end gap-2">
+        <div className="flex-1">
+          <Label htmlFor="filterDate">Filtrar por Data</Label>
+          <Input
+            id="filterDate"
+            type="date"
+            value={filterDate}
+            onChange={e => setFilterDate(e.target.value)}
+          />
+        </div>
+        {filterDate && (
+          <Button
+            variant="outline"
+            onClick={() => setFilterDate('')}
           >
-            <AccordionSummary expandIcon={<GridExpandMoreIcon />}>
-              <Typography variant="h6">
-                {/* <Button
-                  onClick={() => navigate(`/evolucao_rcp/edit/${vital.id}`)}
-                  color="primary"
-                >
-                  Editar
-                </Button> */}
-                {`Evolução ${patientsData?.area_atendimento}`}{' '}
-                {moment(getRecordDate(vital)).format('DD/MM/YYYY')}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={2}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                >
-                  Sinais vitais iniciais
-                </Typography>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableBody>{renderDataTable(vital.ssvv_inicial)}</TableBody>
-                  </Table>
-                </TableContainer>
+            Limpar Filtro
+          </Button>
+        )}
+      </div>
 
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                >
-                  Sinais vitais finais
-                </Typography>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableBody>{renderDataTable(vital.ssvv_final)}</TableBody>
-                  </Table>
-                </TableContainer>
-
-                {renderAuscultaPulmonar(vital.ausculta_pulmonar, vital)}
-
-                {renderTreinamento(
-                  vital.treinamento_aerobico,
-                  'Treinamento Aeróbico'
-                )}
-
-                {renderTreinamento(
-                  vital.treinamento_resistido,
-                  'Treinamento Resistido'
-                )}
-
-                {renderTreinamento(
-                  vital.treinamento_funcional,
-                  'Treinamento Funcional'
-                )}
-
-                {renderTerapia(vital.tmi, 'TMI')}
-
-                {renderTerapia(vital.terapia_expansao, 'Terapia Expansão')}
-
-                {renderTerapia(
-                  vital.terapia_remo_secrecao,
-                  'Terapia Remoção de Secreção'
-                )}
-              </Stack>
-            </AccordionDetails>
-
-            <Grid
-              container
-              justifyContent="flex-start"
-              sx={{ padding: 2 }}
-              direction={'column'}
+      {/* Evoluções */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Evoluções</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredVitalsData.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              Nenhuma evolução encontrada.
+            </p>
+          ) : (
+            <Accordion
+              type="single"
+              collapsible
+              className="w-full"
             >
-              <Typography variant="subtitle1">
-                <strong>Fisioterapeuta</strong>
-                {`: ${vital.fisioterapeuta}`}
-              </Typography>
+              {filteredVitalsData.map(vital => {
+                const date = vital?.data_atendimento || vital?.created;
+                return (
+                  <AccordionItem
+                    key={vital.id}
+                    value={vital.id}
+                  >
+                    <AccordionTrigger>
+                      Evolução {paciente.area_atendimento} -{' '}
+                      {moment(date).format('DD/MM/YYYY')}
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      {vital.ssvv_inicial && (
+                        <div>
+                          <h4 className="font-semibold mb-2">
+                            Sinais Vitais Iniciais
+                          </h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.ssvv_inicial)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
 
-              <Typography>
-                <strong>Data do Atendimento</strong>
-                {`: ${moment(getRecordDate(vital)).format('DD/MM/YYYY')}`}
-              </Typography>
+                      {vital.ssvv_final && (
+                        <div>
+                          <h4 className="font-semibold mb-2">
+                            Sinais Vitais Finais
+                          </h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.ssvv_final)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
 
-              {vital?.observacao ? (
-                <Typography variant="subtitle1">
-                  <strong>Observações</strong>
-                  {`: ${vital.observacao}`}
-                </Typography>
-              ) : null}
-            </Grid>
-          </Accordion>
-        ))}
-      </Stack>
-    </Show>
+                      {vital.ausculta_pulmonar && Object.keys(vital.ausculta_pulmonar).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">
+                            Ausculta Pulmonar
+                          </h4>
+                          
+                          {vital.ausculta_pulmonar.localizacao && Object.keys(vital.ausculta_pulmonar.localizacao).length > 0 && (
+                            <div className="mb-3">
+                              <p className="font-medium text-sm mb-1">Localização:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {Object.entries(vital.ausculta_pulmonar.localizacao)
+                                  .filter(([_, value]) => value === 'on' || value === true)
+                                  .map(([key]) => (
+                                    <span key={key} className="px-2 py-1 bg-primary/10 text-primary rounded text-sm">
+                                      {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {vital.ausculta_pulmonar.ruidos && Object.keys(vital.ausculta_pulmonar.ruidos).length > 0 && (
+                            <div className="mb-3">
+                              <p className="font-medium text-sm mb-1">Ruídos:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {Object.entries(vital.ausculta_pulmonar.ruidos)
+                                  .filter(([_, value]) => value === 'on' || value === true)
+                                  .map(([key]) => (
+                                    <span key={key} className="px-2 py-1 bg-secondary/10 text-secondary rounded text-sm">
+                                      {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {vital.ausculta_pulmonar.mv && Object.keys(vital.ausculta_pulmonar.mv).length > 0 && (
+                            <div className="mb-3">
+                              <p className="font-medium text-sm mb-1">Murmúrio Vesicular (MV):</p>
+                              <div className="flex flex-wrap gap-2">
+                                {Object.entries(vital.ausculta_pulmonar.mv)
+                                  .filter(([_, value]) => value === 'on' || value === true)
+                                  .map(([key]) => (
+                                    <span key={key} className="px-2 py-1 bg-tertiary/10 text-tertiary rounded text-sm">
+                                      {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Treinamento Aeróbico */}
+                      {vital.treinamento_aerobico && Object.keys(vital.treinamento_aerobico).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">1. Treinamento Aeróbico</h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.treinamento_aerobico)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+
+                      {/* Treinamento Resistido */}
+                      {vital.treinamento_resistido && Object.keys(vital.treinamento_resistido).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">2. Treinamento Resistido</h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.treinamento_resistido)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+
+                      {/* Exercícios Funcionais */}
+                      {vital.treinamento_funcional && Object.keys(vital.treinamento_funcional).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">3. Exercícios Funcionais</h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.treinamento_funcional)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+
+                      {/* TMI */}
+                      {vital.tmi && Object.keys(vital.tmi).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">4. TMI (Treinamento Muscular Inspiratório)</h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.tmi)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+
+                      {/* Terapia de Expansão */}
+                      {vital.terapia_expansao && Object.keys(vital.terapia_expansao).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">5. Terapia de Expansão Pulmonar</h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.terapia_expansao)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+
+                      {/* Terapia de Remoção de Secreção */}
+                      {vital.terapia_remo_secrecao && Object.keys(vital.terapia_remo_secrecao).length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">6. Terapia de Remoção de Secreção</h4>
+                          <Table>
+                            <TableBody>
+                              {renderDataTable(vital.terapia_remo_secrecao)}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+
+                      <div className="pt-4 border-t space-y-2">
+                        {vital.fisioterapeuta && (
+                          <p>
+                            <span className="font-medium">Fisioterapeuta:</span>{' '}
+                            {vital.fisioterapeuta}
+                          </p>
+                        )}
+                        {vital.observacao && (
+                          <p>
+                            <span className="font-medium">Observações:</span>{' '}
+                            {vital.observacao}
+                          </p>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          )}
+        </CardContent>
+      </Card>
+
+      <AlertDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este paciente? Esta ação também
+              excluirá todas as evoluções relacionadas e não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && deleteMutation.mutate(deleteId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };

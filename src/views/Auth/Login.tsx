@@ -1,76 +1,84 @@
-import React from 'react';
-import { useLogin } from '@refinedev/core';
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
-import GoogleIcon from '@mui/icons-material/Google';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers/AuthProvider';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
-export const Login: React.FC = () => {
-  const { mutate: login, isLoading } = useLogin();
+export const Login = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  // Login temporário para desenvolvimento - bypassa autenticação
-  const handleTempLogin = () => {
-    // Simula um login bem-sucedido
-    localStorage.setItem('temp_auth', 'true');
-    navigate('/');
-    window.location.reload();
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      await login();
+      navigate('/');
+    } catch (error) {
+      console.error('Erro no login:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-    >
-      <Paper
-        elevation={3}
-        sx={{ p: 4, width: 380 }}
-      >
-        <Stack
-          spacing={3}
-          alignItems="center"
-        >
-          <Typography variant="h6">Integra</Typography>
-          <Typography
-            variant="h5"
-            align="center"
-          >
-            Entrar
-          </Typography>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-900 dark:to-gray-800 p-4 relative">
+      {/* Background Logo */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0">
+        <img
+          src="/IntegraLogo.png"
+          alt="Integra"
+          className="w-[800px] h-[800px] object-contain opacity-[0.05] dark:opacity-[0.03]"
+        />
+      </div>
 
-          {/* Login temporário para desenvolvimento */}
+      <Card className="w-full max-w-md relative z-10">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto mb-4">
+            <img
+              src="/IntegraLogo.png"
+              alt="Integra"
+              className="w-24 h-24 object-contain mx-auto"
+            />
+          </div>
+          <CardTitle className="text-2xl">Integra</CardTitle>
+          <CardDescription>
+            Sistema de Prontuário de Atendimentos
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-            onClick={handleTempLogin}
+            className="w-full"
+            size="lg"
+            onClick={handleLogin}
+            disabled={loading}
           >
-            🔧 Acesso Temporário (DEV)
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Acesso Temporário (DEV)
           </Button>
 
-          {/* Google OAuth - desabilitado temporariamente */}
           <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<GoogleIcon />}
-            disabled={true}
-            title="Google OAuth será configurado depois"
+            className="w-full"
+            variant="outline"
+            size="lg"
+            disabled
           >
             Entrar com Google (Em breve)
           </Button>
 
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            align="center"
-          >
-            Use "Acesso Temporário" para testar as collections
-          </Typography>
-        </Stack>
-      </Paper>
-    </Box>
+          <p className="text-sm text-muted-foreground text-center">
+            Use "Acesso Temporário" para testar o sistema
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
