@@ -33,11 +33,10 @@ export function useCreate<TData = any, TVariables = any>(
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['list', resource] });
       toast.success('Registro criado com sucesso!');
-      mutationOptions?.onSuccess?.(data, variables, context);
     },
-    onError: (error: Error, variables, context) => {
-      toast.error(error.message || 'Erro ao criar registro');
-      mutationOptions?.onError?.(error, variables, context);
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao criar registro';
+      toast.error(errorMessage);
     },
     ...mutationOptions,
   });
@@ -78,11 +77,10 @@ export function useUpdate<TData = any, TVariables = any>(
         queryKey: ['one', resource, variables.id],
       });
       toast.success('Registro atualizado com sucesso!');
-      mutationOptions?.onSuccess?.(data, variables, context);
     },
-    onError: (error: Error, variables, context) => {
-      toast.error(error.message || 'Erro ao atualizar registro');
-      mutationOptions?.onError?.(error, variables, context);
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao atualizar registro';
+      toast.error(errorMessage);
     },
     ...mutationOptions,
   });
@@ -138,11 +136,10 @@ export function useDelete(options: DeleteOptions) {
       queryClient.invalidateQueries({ queryKey: ['list', resource] });
       queryClient.invalidateQueries({ queryKey: ['one', resource, variables] });
       toast.success('Registro excluído com sucesso!');
-      mutationOptions?.onSuccess?.(data, variables, context);
     },
-    onError: (error: Error, variables, context) => {
-      toast.error(error.message || 'Erro ao excluir registro');
-      mutationOptions?.onError?.(error, variables, context);
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir registro';
+      toast.error(errorMessage);
     },
     ...mutationOptions,
   });
