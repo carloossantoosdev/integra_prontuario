@@ -26,8 +26,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useList } from '@/hooks/usePocketbaseQuery';
-import { useDelete } from '@/hooks/usePocketbaseMutation';
+import { useList } from '@/hooks/useSupabaseQuery';
+import { useDelete } from '@/hooks/useSupabaseMutation';
 
 interface Paciente {
   id: string;

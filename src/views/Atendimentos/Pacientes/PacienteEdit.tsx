@@ -18,8 +18,8 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
-import { useOne } from '@/hooks/usePocketbaseQuery';
-import { useUpdate } from '@/hooks/usePocketbaseMutation';
+import { useOne } from '@/hooks/useSupabaseQuery';
+import { useUpdate } from '@/hooks/useSupabaseMutation';
 
 const formSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),

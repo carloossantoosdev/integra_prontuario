@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { pocketbaseClient } from '@/utils/pocketbaseClient';
+import { supabaseClient } from '@/utils/supabaseClient';
 import { toast } from 'sonner';
 
 interface User {
@@ -32,13 +32,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return true;
       }
 
-      // Verificar autenticação do PocketBase
-      if (pocketbaseClient.authStore.isValid) {
-        const authData = pocketbaseClient.authStore.model;
-        if (authData) {
-          setUser(authData as User);
-          return true;
-        }
+      // Verificar autenticação do Supabase
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession();
+
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.name || session.user.email,
+        });
+        return true;
       }
 
       setUser(null);
@@ -66,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       localStorage.removeItem('temp_auth');
-      pocketbaseClient.authStore.clear();
+      await supabaseClient.auth.signOut();
       setUser(null);
       toast.success('Logout realizado com sucesso!');
     } catch (error: any) {

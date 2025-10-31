@@ -17,23 +17,18 @@ export const maskCarga = (value: string): string => {
  * Exemplo: "310" -> "3/10"
  */
 export const maskSeriesRepeticoes = (value: string): string => {
-  // Remove tudo que não é número ou /
   let cleaned = value.replace(/[^\d/]/g, '');
 
-  // Remove múltiplas barras
   cleaned = cleaned.replace(/\/+/g, '/');
 
-  // Se já tem barra, não faz nada
   if (cleaned.includes('/')) {
     const parts = cleaned.split('/');
-    // Limita a 2 partes
     if (parts.length > 2) {
       cleaned = `${parts[0]}/${parts[1]}`;
     }
     return cleaned;
   }
 
-  // Se tem apenas números, adiciona barra após o primeiro número
   if (cleaned.length > 1) {
     return `${cleaned.charAt(0)}/${cleaned.slice(1)}`;
   }

@@ -49,9 +49,9 @@ export const TreinamentoAerobicoForm = ({
             ))}
           </div>
         </RadioGroup>
-        {errors.treinamento_aerobico?.tipo && (
+        {errors.treinamento_aerobico && 'tipo' in errors.treinamento_aerobico && (
           <p className="text-sm text-destructive mt-2">
-            {errors.treinamento_aerobico.tipo?.message as string}
+            {(errors.treinamento_aerobico as any).tipo?.message as string}
           </p>
         )}
       </div>
@@ -66,9 +66,9 @@ export const TreinamentoAerobicoForm = ({
               required: 'Intensidade é obrigatória',
             })}
           />
-          {errors.treinamento_aerobico?.intensidade && (
+          {errors.treinamento_aerobico && 'intensidade' in errors.treinamento_aerobico && (
             <p className="text-sm text-destructive mt-1">
-              {errors.treinamento_aerobico.intensidade?.message as string}
+              {(errors.treinamento_aerobico as any).intensidade?.message as string}
             </p>
           )}
         </div>
@@ -81,9 +81,9 @@ export const TreinamentoAerobicoForm = ({
               required: 'Duração é obrigatória',
             })}
           />
-          {errors.treinamento_aerobico?.duracao && (
+          {errors.treinamento_aerobico && 'duracao' in errors.treinamento_aerobico && (
             <p className="text-sm text-destructive mt-1">
-              {errors.treinamento_aerobico.duracao?.message as string}
+              {(errors.treinamento_aerobico as any).duracao?.message as string}
             </p>
           )}
         </div>
@@ -96,9 +96,9 @@ export const TreinamentoAerobicoForm = ({
               required: 'Carga é obrigatória',
             })}
           />
-          {errors.treinamento_aerobico?.carga && (
+          {errors.treinamento_aerobico && 'carga' in errors.treinamento_aerobico && (
             <p className="text-sm text-destructive mt-1">
-              {errors.treinamento_aerobico.carga?.message as string}
+              {(errors.treinamento_aerobico as any).carga?.message as string}
             </p>
           )}
         </div>

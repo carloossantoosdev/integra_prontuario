@@ -24,9 +24,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useOne } from '@/hooks/usePocketbaseQuery';
-import { useDelete } from '@/hooks/usePocketbaseMutation';
-import { pocketbaseClient } from '@/utils/pocketbaseClient';
+import { useOne } from '@/hooks/useSupabaseQuery';
+import { useDelete } from '@/hooks/useSupabaseMutation';
+import { supabaseClient } from '@/utils/supabaseClient';
 import moment from 'moment';
 
 export const PacienteShow = () => {
@@ -58,14 +58,18 @@ export const PacienteShow = () => {
             ? 'evolucao_dnm'
             : 'evolucao_rcp';
 
-          const vitalsResult = await pocketbaseClient
-            .collection(collectionName)
-            .getList(1, 50, {
-              filter: `patient_id="${paciente.id}"`,
-              sort: '-data_atendimento',
-            });
+          const { data: vitalsResult, error } = await supabaseClient
+            .from(collectionName)
+            .select('*')
+            .eq('patient_id', paciente.id)
+            .order('data_atendimento', { ascending: false })
+            .limit(50);
 
-          setVitalsData(vitalsResult.items);
+          if (error) {
+            throw error;
+          }
+
+          setVitalsData(vitalsResult || []);
         } catch (error) {
           console.error('Erro ao buscar evoluções:', error);
           setVitalsData([]);

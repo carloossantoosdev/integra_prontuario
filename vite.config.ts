@@ -16,6 +16,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['pocketbase'],
+    // Configurações de otimização de dependências
   },
 });

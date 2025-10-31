@@ -32,9 +32,9 @@ export const SinaisVitaisForm = ({
                     required: `${fieldName} é obrigatório`,
                   })}
                 />
-                {errors.ssvv_inicial?.[fieldName] && (
+                {errors.ssvv_inicial && fieldName in errors.ssvv_inicial && (
                   <p className="text-sm text-destructive mt-1">
-                    {errors.ssvv_inicial[fieldName]?.message as string}
+                    {(errors.ssvv_inicial as any)[fieldName]?.message as string}
                   </p>
                 )}
               </div>
@@ -62,9 +62,9 @@ export const SinaisVitaisForm = ({
                     required: `${fieldName} é obrigatório`,
                   })}
                 />
-                {errors.ssvv_final?.[fieldName] && (
+                {errors.ssvv_final && fieldName in errors.ssvv_final && (
                   <p className="text-sm text-destructive mt-1">
-                    {errors.ssvv_final[fieldName]?.message as string}
+                    {(errors.ssvv_final as any)[fieldName]?.message as string}
                   </p>
                 )}
               </div>
