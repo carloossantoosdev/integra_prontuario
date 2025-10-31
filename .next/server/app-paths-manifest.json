@@ -1,0 +1,7 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/AppointmentForm/page": "app/AppointmentForm/page.js",
+  "/cadastro-atendimentos/[id]/page": "app/cadastro-atendimentos/[id]/page.js",
+  "/page": "app/page.js",
+  "/cadastro-atendimentos/page": "app/cadastro-atendimentos/page.js"
+}
