@@ -1,185 +1,316 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable no-mixed-spaces-and-tabs */
-import React from 'react';
-import { Box, Button, IconButton } from '@mui/material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { useMany } from '@refinedev/core';
-import {
-  DateField,
-  EditButton,
-  List,
-  ShowButton,
-  useDataGrid,
-} from '@refinedev/mui';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
+import { Plus, Eye, Trash2, Search, X } from 'lucide-react';
+import { PageHeader } from '@/components/crud/PageHeader';
+import { DataTable } from '@/components/crud/DataTable';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useList } from '@/hooks/useSupabaseQuery';
+import { useDelete } from '@/hooks/useSupabaseMutation';
+
+interface Paciente {
+  id: string;
+  nome: string;
+  data_nascimento: string;
+  inicio_atendimento: string;
+  valor: number;
+  area_atendimento: string;
+}
 
 export const PacienteList = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const pageSize = queryParams.get('pageSize') || 10;
-  const current = queryParams.get('current') || 1;
-
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchNome, setSearchNome] = useState('');
+  const [searchNomeDebounced, setSearchNomeDebounced] = useState('');
+  const [filterArea, setFilterArea] = useState<string>('');
+  const pageSize = 10;
 
-  const { dataGridProps } = useDataGrid({
-    meta: {
-      select:
-        'id, nome, data_nascimento, inicio_atendimento, valor, area_atendimento',
-    },
-    pagination: {
-      pageSize: Number(pageSize),
-      current: Number(current),
-    },
-  });
+  // Debounce para o campo de busca por nome
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchNomeDebounced(searchNome);
+      setCurrentPage(0); // Reset página ao filtrar
+    }, 1000);
 
-  useMany({
-    resource: 'pacientes',
-    ids:
-      dataGridProps?.rows
-        ?.map((item: { categories: { id: string } }) => item?.categories?.id)
-        .filter(Boolean) ?? [],
-    queryOptions: {
-      enabled: !!dataGridProps?.rows,
-    },
-  });
+    return () => clearTimeout(timer);
+  }, [searchNome]);
 
-  const columns = React.useMemo<GridColDef[]>(
-    () => [
-      {
-        field: 'actions',
-        headerName: 'Ações',
-        sortable: false,
-        renderCell: ({ row }) => (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <IconButton
-              onClick={() => {
-                row.area_atendimento === 'RCP'
-                  ? navigate(`/evolucao_rcp/create/${row.id}`)
-                  : navigate(`/evolucao_dnm/create/${row.id}`);
-              }}
-            >
-              <AddCircleOutlineIcon
-                sx={{ fontSize: 20 }}
-                color="primary"
-              />
-            </IconButton>
+  // Construir filtros dinamicamente
+  const buildFilters = () => {
+    const filters: Record<string, any> = {};
 
-            <ShowButton
-              hideText
-              recordItemId={row.id}
-            />
-          </Box>
-        ),
-        // renderCell: function render({ row }) {
-        // 	return (
-        // 			<DeleteButton
-        // 				hideText
-        // 				recordItemId={row.id}
-        // 				confirmTitle="Deseja excluir este item?"
-        // 				confirmCancelText='Cancelar'
-        // 				confirmOkText='Excluir'
-        // 			/>
-        // 	);
-        // },
-        align: 'center',
-        headerAlign: 'center',
-        minWidth: 110,
-      },
-      {
-        field: 'nome',
-        flex: 1,
-        headerName: 'Nome',
-        minWidth: 150,
-      },
-      {
-        field: 'data_nascimento',
-        flex: 1,
-        headerName: 'Data nascimento',
-        minWidth: 150,
-        renderCell: function render({ value }) {
-          return (
-            <Box
-              display="flex"
-              justifyContent="flex-start"
-              alignItems="center"
-              height="100%"
-            >
-              <DateField value={value} />
-            </Box>
-          );
-        },
-      },
-      {
-        field: 'inicio_atendimento',
-        flex: 1,
-        headerName: 'Início atendimento',
-        minWidth: 150,
-        renderCell: function render({ value }) {
-          return (
-            <Box
-              display="flex"
-              justifyContent="flex-start"
-              alignItems="center"
-              height="100%"
-            >
-              <DateField value={value} />
-            </Box>
-          );
-        },
-      },
-      {
-        field: 'valor',
-        flex: 1,
-        headerName: 'Valor',
-        minWidth: 110,
-        renderCell: function render({ value }) {
-          return value
-            ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-            : 'R$ 0,00';
-        },
-      },
-      {
-        field: 'area_atendimento',
-        flex: 1,
-        headerName: 'Área de atendimento',
-        minWidth: 150,
-      },
-    ],
-    []
-  );
+    if (searchNomeDebounced) {
+      filters.nome = searchNomeDebounced;
+      filters._searchMode = 'contains'; // Para busca parcial
+    }
 
-  const handleCreate = () => {
-    navigate('/pacientes/create');
+    if (filterArea && filterArea !== 'all') {
+      filters.area_atendimento = filterArea;
+    }
+
+    return filters;
   };
 
-  return (
-    <List headerButtons={[null]}>
-      <Box
-        sx={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'end',
-          marginBottom: 2,
-        }}
-      >
-        <Button
-          onClick={handleCreate}
-          variant="contained"
-        >
-          Novo paciente
-        </Button>
-      </Box>
+  const { data, isLoading, refetch } = useList<Paciente>({
+    resource: 'pacientes',
+    filters: buildFilters(),
+    pagination: {
+      current: currentPage + 1,
+      pageSize,
+    },
+  });
 
-      <DataGrid
-        {...dataGridProps}
-        columns={columns}
+  const deleteMutation = useDelete({
+    resource: 'pacientes',
+    mutationOptions: {
+      onSuccess: () => {
+        refetch();
+        setDeleteId(null);
+      },
+    },
+  });
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
+  };
+
+  const columns: ColumnDef<Paciente>[] = [
+    {
+      accessorKey: 'nome',
+      header: 'Nome',
+    },
+    {
+      accessorKey: 'data_nascimento',
+      header: 'Data de Nascimento',
+      cell: ({ row }) => {
+        const date = row.getValue('data_nascimento') as string;
+        if (!date) return '-';
+        try {
+          return format(new Date(date), 'dd/MM/yyyy');
+        } catch {
+          return date;
+        }
+      },
+    },
+    {
+      accessorKey: 'inicio_atendimento',
+      header: 'Início Atendimento',
+      cell: ({ row }) => {
+        const date = row.getValue('inicio_atendimento') as string;
+        if (!date) return '-';
+        try {
+          return format(new Date(date), 'dd/MM/yyyy');
+        } catch {
+          return date;
+        }
+      },
+    },
+    {
+      accessorKey: 'valor',
+      header: 'Valor',
+      cell: ({ row }) => {
+        const valor = row.getValue('valor') as number;
+        return valor
+          ? `R$ ${valor.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`
+          : 'R$ 0,00';
+      },
+    },
+    {
+      accessorKey: 'area_atendimento',
+      header: 'Área de Atendimento',
+    },
+    {
+      id: 'actions',
+      header: 'Ações',
+      cell: ({ row }) => {
+        const paciente = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const route =
+                  paciente.area_atendimento === 'RCP'
+                    ? `/evolucao_rcp/create/${paciente.id}`
+                    : `/evolucao_dnm/create/${paciente.id}`;
+                navigate(route);
+              }}
+              title="Adicionar Evolução"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(`/pacientes/show/${paciente.id}`)}
+              title="Ver Detalhes"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setDeleteId(paciente.id)}
+              title="Excluir"
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const handleClearFilters = () => {
+    setSearchNome('');
+    setSearchNomeDebounced('');
+    setFilterArea('');
+    setCurrentPage(0);
+  };
+
+  const hasActiveFilters = searchNome || filterArea;
+  const isSearching = searchNome !== searchNomeDebounced;
+
+  return (
+    <div className="space-y-4">
+      <PageHeader
+        title="Pacientes"
+        subtitle="Gerenciar cadastro de pacientes"
+        actions={
+          <Button onClick={() => navigate('/pacientes/create')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Paciente
+          </Button>
+        }
       />
-    </List>
+
+      {/* Filtros */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="searchNome">Buscar por Nome</Label>
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="searchNome"
+                  placeholder="Digite o nome..."
+                  value={searchNome}
+                  onChange={e => setSearchNome(e.target.value)}
+                  className="pl-8"
+                />
+                {isSearching && (
+                  <div className="absolute right-2 top-2.5">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  </div>
+                )}
+              </div>
+              {isSearching && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Buscando...
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="filterArea">Área de Atendimento</Label>
+              <Select
+                value={filterArea}
+                onValueChange={value => {
+                  setFilterArea(value);
+                  setCurrentPage(0);
+                }}
+              >
+                <SelectTrigger id="filterArea">
+                  <SelectValue placeholder="Todas as áreas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as áreas</SelectItem>
+                  <SelectItem value="RCP">RCP</SelectItem>
+                  <SelectItem value="DNM">DNM</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-end">
+              {hasActiveFilters && (
+                <Button
+                  variant="outline"
+                  onClick={handleClearFilters}
+                  className="w-full"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Limpar Filtros
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <DataTable
+        columns={columns}
+        data={data?.data || []}
+        loading={isLoading}
+        pagination={{
+          pageIndex: currentPage,
+          pageSize,
+          total: data?.total || 0,
+          onPageChange: setCurrentPage,
+        }}
+      />
+
+      <AlertDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este paciente? Esta ação também
+              excluirá todas as evoluções relacionadas e não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };

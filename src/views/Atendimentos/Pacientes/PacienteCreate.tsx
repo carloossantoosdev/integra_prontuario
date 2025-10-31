@@ -1,222 +1,255 @@
-import {
-  Box,
-  TextField,
-  Typography,
-  Grid,
-  FormControlLabel,
-  RadioGroup,
-  Radio,
-  FormHelperText,
-} from '@mui/material';
-import { Create } from '@refinedev/mui';
-import { useForm } from '@refinedev/react-hook-form';
-import { Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useCreate, useNotification } from '@refinedev/core';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { PageHeader } from '@/components/crud/PageHeader';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import { useCreate } from '@/hooks/useSupabaseMutation';
+import { toast } from 'sonner';
+
+const formSchema = z.object({
+  nome: z.string().min(1, 'Nome é obrigatório'),
+  data_nascimento: z.string().min(1, 'Data de nascimento é obrigatória'),
+  inicio_atendimento: z.string().min(1, 'Início do atendimento é obrigatório'),
+  valor: z.string().min(1, 'Valor é obrigatório'),
+  area_atendimento: z.enum(['RCP', 'DNM'], {
+    required_error: 'Selecione uma área de atendimento',
+  }),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export const PacienteCreate = () => {
-  const {
-    saveButtonProps,
-    refineCore: { formLoading },
-    formState: { errors },
-    register,
-    control,
-    handleSubmit,
-  } = useForm();
-
-  const { mutateAsync: createPaciente } = useCreate();
-  const { open } = useNotification();
-
   const navigate = useNavigate();
 
-  const onSubmit = async (formData: {
-    nome: string;
-    data_nascimento: Date;
-    inicio_atendimento: Date;
-    valor: number;
-    area_atendimento: string;
-  }) => {
-    try {
-      const values = {
-        nome: formData.nome,
-        data_nascimento: formData.data_nascimento
-          ? new Date(formData.data_nascimento).toISOString().split('T')[0]
-          : null,
-        inicio_atendimento: formData.inicio_atendimento
-          ? new Date(formData.inicio_atendimento).toISOString().split('T')[0]
-          : null,
-        valor:
-          formData.valor === undefined || formData.valor === null
-            ? null
-            : Number(formData.valor),
-        area_atendimento: formData.area_atendimento,
-      } as any;
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      nome: '',
+      data_nascimento: '',
+      inicio_atendimento: '',
+      valor: '',
+      area_atendimento: undefined,
+    },
+  });
 
-      await createPaciente({
-        resource: 'pacientes',
-        values,
-      });
+  const createMutation = useCreate({
+    resource: 'pacientes',
+    mutationOptions: {
+      onSuccess: () => {
+        toast.success('Paciente cadastrado com sucesso!', {
+          description: 'Os dados foram salvos corretamente.',
+        });
+        setTimeout(() => navigate('/pacientes'), 1000);
+      },
+      onError: (error: any) => {
+        toast.error('Erro ao cadastrar paciente', {
+          description: error?.message || 'Ocorreu um erro ao salvar os dados.',
+        });
+      },
+    },
+  });
 
-      open?.({
-        type: 'success',
-        message: 'Paciente cadastrado com sucesso',
-      });
+  const onSubmit = (data: FormData) => {
+    // Converter valor de string para número
+    const valorNumerico = parseFloat(
+      data.valor.replace(/[^\d,]/g, '').replace(',', '.')
+    );
 
-      navigate('/pacientes');
-    } catch (error: any) {
-      open?.({
-        type: 'error',
-        message: error?.message ?? 'Erro ao cadastrar paciente',
-      });
-    }
+    createMutation.mutate({
+      nome: data.nome,
+      data_nascimento: data.data_nascimento,
+      inicio_atendimento: data.inicio_atendimento,
+      valor: valorNumerico,
+      area_atendimento: data.area_atendimento,
+    });
   };
 
-  const initialFields = [
-    { name: 'nome', type: 'text', label: 'Nome Paciente', required: true },
-    { name: 'valor', type: 'number', label: 'Valor', required: true },
-    {
-      name: 'data_nascimento',
-      type: 'date',
-      label: 'Data de Nascimento',
-      required: true,
-    },
-    {
-      name: 'inicio_atendimento',
-      type: 'date',
-      label: 'Início do Atendimento',
-      required: true,
-    },
-  ];
+  const formatCurrency = (value: string) => {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, '');
+    if (!numbers) return '';
+
+    // Converte para número e formata
+    const amount = parseFloat(numbers) / 100;
+    return amount.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+  };
 
   return (
-    <Create
-      isLoading={formLoading}
-      saveButtonProps={{
-        ...saveButtonProps,
-        onClick: handleSubmit(onSubmit as any),
-        children: 'Salvar paciente',
-      }}
-      title="Criar Paciente"
-    >
-      <Box
-        component="form"
-        sx={{ display: 'flex', flexDirection: 'column' }}
-        autoComplete="off"
-      >
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-        >
-          Dados do Paciente
-        </Typography>
-        <Grid
-          container
-          spacing={2}
-        >
-          {initialFields.map(({ name, type, label, required }) => (
-            <Grid
-              item
-              xs={6}
-              key={name}
+    <div>
+      <PageHeader
+        title="Criar Paciente"
+        subtitle="Cadastrar um novo paciente no sistema"
+        showBackButton
+      />
+
+      <Card>
+        <CardContent className="pt-6">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6"
             >
-              {name === 'valor' ? (
-                <Controller
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="nome"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome do Paciente</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Digite o nome"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="valor"
-                  control={control}
-                  rules={{ required: 'Valor é obrigatório' }}
-                  render={({ field }) => {
-                    const formatter = new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    });
-                    const displayValue =
-                      field.value === undefined ||
-                      field.value === null ||
-                      field.value === ''
-                        ? ''
-                        : formatter.format(Number(field.value));
-
-                    const parseBRL = (input: string) => {
-                      const digits = input.replace(/[^\d]/g, '');
-                      if (!digits) return '';
-                      return Number(digits) / 100;
-                    };
-
-                    return (
-                      <TextField
-                        value={displayValue}
-                        onChange={e => {
-                          const num = parseBRL(e.target.value);
-                          field.onChange(num);
-                        }}
-                        required={true}
-                        type="text"
-                        error={!!errors[name]}
-                        helperText={errors[name]?.message as string}
-                        margin="normal"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label={label}
-                      />
-                    );
-                  }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="R$ 0,00"
+                          value={field.value ? formatCurrency(field.value) : ''}
+                          onChange={e => {
+                            const formatted = e.target.value.replace(
+                              /[^\d]/g,
+                              ''
+                            );
+                            field.onChange(formatted);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              ) : (
-                <TextField
-                  {...register(name, {
-                    required: required ? `${label} é obrigatório` : false,
-                  })}
-                  required={true}
-                  type={type}
-                  error={!!errors[name]}
-                  helperText={errors[name]?.message as string}
-                  margin="normal"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  label={label}
-                />
-              )}
-            </Grid>
-          ))}
 
-          <Grid
-            item
-            xs={12}
-          >
-            <Typography
-              variant="h6"
-              marginTop={2}
-              fontWeight="bold"
-            >
-              Área de Atendimento
-            </Typography>
-            <Controller
-              name="area_atendimento"
-              control={control}
-              rules={{ required: 'Selecione uma área de atendimento' }}
-              render={({ field }) => (
-                <RadioGroup {...field}>
-                  <FormControlLabel
-                    value="RCP"
-                    control={<Radio />}
-                    label="RCP"
-                  />
-                  <FormControlLabel
-                    value="DNM"
-                    control={<Radio />}
-                    label="DNM"
-                  />
-                </RadioGroup>
-              )}
-            />
-            {errors.area_atendimento && (
-              <FormHelperText error>
-                {errors.area_atendimento.message as string}
-              </FormHelperText>
-            )}
-          </Grid>
-        </Grid>
-      </Box>
-    </Create>
+                <FormField
+                  control={form.control}
+                  name="data_nascimento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Nascimento</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="inicio_atendimento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Início do Atendimento</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="area_atendimento"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Área de Atendimento</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="RCP"
+                            id="rcp"
+                          />
+                          <Label
+                            htmlFor="rcp"
+                            className="font-normal"
+                          >
+                            RCP
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="DNM"
+                            id="dnm"
+                          />
+                          <Label
+                            htmlFor="dnm"
+                            className="font-normal"
+                          >
+                            DNM
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/pacientes')}
+                  disabled={createMutation.isPending}
+                >
+                  Cancelar
+                </Button>
+
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                >
+                  {createMutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Salvar Paciente
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

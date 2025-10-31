@@ -21,6 +21,21 @@ export interface KpiMetrics {
   faturamento_reab_idoso: number;
   faturamento_dnm: number;
   faturamento_sono: number;
+
+  // Aquisição e retenção
+  novos_clientes_total?: number;
+  clientes_perdidos_total?: number;
+  novos_por_canal?: Record<string, number>; // exemplo: { organico, indicacao, campanha_meta }
+
+  // Operacional
+  sessoes_planejadas_total?: number;
+  sessoes_realizadas_total?: number;
+  no_show_total?: number;
+  horas_trabalhadas_total?: number;
+
+  // Financeiro
+  custo_operacional_total?: number;
+  custo_marketing_total?: number;
 }
 
 export interface KpiMonthly {
@@ -30,6 +45,7 @@ export interface KpiMonthly {
   created_by?: string | null;
   created_at?: string;
   updated_at?: string;
+  targets?: KpiTargets | null;
 }
 
 export interface KpiQueryParams {
@@ -37,9 +53,22 @@ export interface KpiQueryParams {
   to?: string; // inclusive (YYYY-MM-01)
 }
 
+export interface KpiTargets {
+  faturamento_total?: number;
+  clientes_total?: number;
+  ticket_medio?: number;
+  // metas por área (opcionais)
+  faturamento_reab_ped?: number;
+  faturamento_reab_adulto?: number;
+  faturamento_reab_idoso?: number;
+  faturamento_dnm?: number;
+  faturamento_sono?: number;
+}
+
 export interface KpiUpsertInput {
   refDate: YearMonthString; // YYYY-MM
   metrics: KpiMetrics;
+  targets?: KpiTargets | null;
 }
 
 export function computeTickets(metrics: KpiMetrics) {
