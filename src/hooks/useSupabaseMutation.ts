@@ -16,6 +16,13 @@ export function useCreate<TData = any, TVariables = any>(
   const queryClient = useQueryClient();
   const { resource, mutationOptions } = options;
 
+  // Separar os callbacks customizados
+  const customOnSuccess = mutationOptions?.onSuccess;
+  const customOnError = mutationOptions?.onError;
+
+  // Remover onSuccess e onError das opções
+  const { onSuccess, onError, ...restMutationOptions } = mutationOptions || {};
+
   return useMutation({
     mutationFn: async (variables: TVariables) => {
       const { data, error } = await supabaseClient
@@ -30,15 +37,24 @@ export function useCreate<TData = any, TVariables = any>(
 
       return data as TData;
     },
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['list', resource] });
+    onSuccess: async (data, variables, context) => {
+      // Aguardar a invalidação do cache antes de continuar
+      await queryClient.invalidateQueries({ queryKey: ['list', resource] });
       toast.success('Registro criado com sucesso!');
+      // Executar o onSuccess customizado, se fornecido
+      if (customOnSuccess) {
+        (customOnSuccess as any)(data, variables, context);
+      }
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao criar registro';
       toast.error(errorMessage);
+      // Executar o onError customizado, se fornecido
+      if (customOnError) {
+        (customOnError as any)(error, variables, context);
+      }
     },
-    ...mutationOptions,
+    ...restMutationOptions,
   });
 }
 
@@ -56,6 +72,13 @@ export function useUpdate<TData = any, TVariables = any>(
   const queryClient = useQueryClient();
   const { resource, mutationOptions } = options;
 
+  // Separar os callbacks customizados
+  const customOnSuccess = mutationOptions?.onSuccess;
+  const customOnError = mutationOptions?.onError;
+
+  // Remover onSuccess e onError das opções
+  const { onSuccess, onError, ...restMutationOptions } = mutationOptions || {};
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: TVariables }) => {
       const { data: result, error } = await supabaseClient
@@ -71,18 +94,29 @@ export function useUpdate<TData = any, TVariables = any>(
 
       return result as TData;
     },
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['list', resource] });
-      queryClient.invalidateQueries({
-        queryKey: ['one', resource, variables.id],
-      });
+    onSuccess: async (data, variables, context) => {
+      // Aguardar a invalidação do cache antes de continuar
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['list', resource] }),
+        queryClient.invalidateQueries({
+          queryKey: ['one', resource, variables.id],
+        }),
+      ]);
       toast.success('Registro atualizado com sucesso!');
+      // Executar o onSuccess customizado, se fornecido
+      if (customOnSuccess) {
+        (customOnSuccess as any)(data, variables, context);
+      }
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao atualizar registro';
       toast.error(errorMessage);
+      // Executar o onError customizado, se fornecido
+      if (customOnError) {
+        (customOnError as any)(error, variables, context);
+      }
     },
-    ...mutationOptions,
+    ...restMutationOptions,
   });
 }
 
@@ -97,6 +131,13 @@ interface DeleteOptions {
 export function useDelete(options: DeleteOptions) {
   const queryClient = useQueryClient();
   const { resource, mutationOptions } = options;
+
+  // Separar os callbacks customizados
+  const customOnSuccess = mutationOptions?.onSuccess;
+  const customOnError = mutationOptions?.onError;
+
+  // Remover onSuccess e onError das opções
+  const { onSuccess, onError, ...restMutationOptions } = mutationOptions || {};
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -132,16 +173,26 @@ export function useDelete(options: DeleteOptions) {
         throw new Error(error.message || 'Erro ao excluir registro');
       }
     },
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['list', resource] });
-      queryClient.invalidateQueries({ queryKey: ['one', resource, variables] });
+    onSuccess: async (data, variables, context) => {
+      // Aguardar a invalidação do cache antes de continuar
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['list', resource] }),
+        queryClient.invalidateQueries({ queryKey: ['one', resource, variables] }),
+      ]);
       toast.success('Registro excluído com sucesso!');
+      // Executar o onSuccess customizado, se fornecido
+      if (customOnSuccess) {
+        (customOnSuccess as any)(data, variables, context);
+      }
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir registro';
       toast.error(errorMessage);
+      // Executar o onError customizado, se fornecido
+      if (customOnError) {
+        (customOnError as any)(error, variables, context);
+      }
     },
-    ...mutationOptions,
+    ...restMutationOptions,
   });
 }
-

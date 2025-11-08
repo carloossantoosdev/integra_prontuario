@@ -18,7 +18,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useCreate } from '@/hooks/useSupabaseMutation';
-import { toast } from 'sonner';
 
 const formSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
@@ -50,15 +49,9 @@ export const PacienteCreate = () => {
     resource: 'pacientes',
     mutationOptions: {
       onSuccess: () => {
-        toast.success('Paciente cadastrado com sucesso!', {
-          description: 'Os dados foram salvos corretamente.',
-        });
-        setTimeout(() => navigate('/pacientes'), 1000);
-      },
-      onError: (error: any) => {
-        toast.error('Erro ao cadastrar paciente', {
-          description: error?.message || 'Ocorreu um erro ao salvar os dados.',
-        });
+        // A invalidação do cache já foi feita pelo hook
+        // Agora podemos navegar imediatamente
+        navigate('/pacientes');
       },
     },
   });
