@@ -23,16 +23,16 @@ export function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center px-4 gap-4">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ borderColor: 'var(--color-border)' }}>
+      <div className="flex h-16 items-center px-4 gap-4">
         {/* Menu Button (Mobile) */}
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden hover:bg-secondary/10"
           onClick={onMenuClick}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5" style={{ color: 'var(--integra-turquoise)' }} />
         </Button>
 
         {/* Logo (Mobile) */}
@@ -40,7 +40,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <img
             src="/Logo.png"
             alt="Integra"
-            className="h-8 object-contain"
+            className="h-10 object-contain"
           />
         </div>
 
@@ -53,6 +53,8 @@ export function Header({ onMenuClick }: HeaderProps) {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
+            className="hover:bg-secondary/10"
+            style={{ color: 'var(--integra-petroleum)' }}
           >
             {theme === 'light' ? (
               <Moon className="h-5 w-5" />
@@ -65,6 +67,8 @@ export function Header({ onMenuClick }: HeaderProps) {
             variant="ghost"
             size="icon"
             onClick={handleLogout}
+            className="hover:bg-destructive/10"
+            style={{ color: 'var(--integra-petroleum)' }}
           >
             <LogOut className="h-5 w-5" />
           </Button>
