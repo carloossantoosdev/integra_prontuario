@@ -1,126 +1,212 @@
-# Configuração de Variáveis de Ambiente
+# Variáveis de Ambiente
 
-Este arquivo documenta todas as variáveis de ambiente necessárias para o projeto.
+Este documento descreve todas as variáveis de ambiente necessárias para o projeto **Integra Prontuário**.
 
-## Variáveis Obrigatórias
+## 📋 Índice
 
-### VITE_SUPABASE_URL
-URL do projeto Supabase. Formato: `https://[project-id].supabase.co`
+- [Variáveis Necessárias](#variáveis-necessárias)
+- [Configuração por Ambiente](#configuração-por-ambiente)
+- [Configuração Local](#configuração-local)
+- [Configuração na Vercel](#configuração-na-vercel)
+- [Como Obter as Credenciais](#como-obter-as-credenciais)
 
-**Exemplos:**
-- Produção: `https://abc123xyz.supabase.co`
-- Homologação: `https://def456uvw.supabase.co`
+---
 
-### VITE_SUPABASE_ANON_KEY
-Chave pública (anon) do Supabase. Pode ser encontrada em:
-- Dashboard Supabase → Settings → API → Project API keys → anon public
+## Variáveis Necessárias
 
-**IMPORTANTE:** Esta é uma chave pública que pode ser exposta no cliente. NUNCA use a service_role key aqui.
+### `VITE_SUPABASE_URL`
+**Obrigatória** | Tipo: `string`
 
-### VITE_ENVIRONMENT (Opcional)
-Define explicitamente o ambiente. Valores aceitos:
-- `production` - Ambiente de produção
-- `preview` - Ambiente de preview/homologação
-- `development` - Ambiente de desenvolvimento local
+URL do projeto Supabase.
 
-**Nota:** Se não especificado, o sistema detecta automaticamente baseado em:
-1. `VERCEL_ENV` (fornecido automaticamente pela Vercel)
-2. `MODE` (modo do Vite)
+- **Produção**: `https://ssxdmbojuvqkkkujakdk.supabase.co`
+- **Homologação**: `https://kmrvojpqauwnzsygsmck.supabase.co`
+
+### `VITE_SUPABASE_ANON_KEY`
+**Obrigatória** | Tipo: `string`
+
+Chave anônima (pública) do projeto Supabase para autenticação client-side.
+
+- **Produção**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzeGRtYm9qdXZxa2trdWpha2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTQ1MDksImV4cCI6MjA3MzE3MDUwOX0.43oP8PkWk3Rr-TewGWEiHiX7oYF-VI_g0EvA4h8B_rM`
+- **Homologação**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttcnZvanBxYXV3bnpzeWdzbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MTY5NTAsImV4cCI6MjA3ODE5Mjk1MH0.sKrSEVsoqyYxNsY24PysyC_GwhUOR2ThpLZUuj2xHC8`
+
+### `VITE_ENVIRONMENT` (Opcional)
+Tipo: `development` | `preview` | `production`
+
+Define explicitamente o ambiente. Se não definida, será detectada automaticamente:
+- Local (Vite): `development`
+- Vercel Preview: `preview`
+- Vercel Production: `production`
+
+---
 
 ## Configuração por Ambiente
 
-### 🏠 Desenvolvimento Local (.env.local)
+### 🔴 Produção (Branch `main`)
 
-Crie um arquivo `.env.local` na raiz do projeto:
+**Projeto Supabase**: `integra-prontuario-prod`
 
 ```env
-# Desenvolvimento Local - Use projeto de HOMOLOGAÇÃO
-VITE_SUPABASE_URL=https://[projeto-homologacao].supabase.co
-VITE_SUPABASE_ANON_KEY=[chave-anon-homologacao]
+VITE_SUPABASE_URL=https://ssxdmbojuvqkkkujakdk.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzeGRtYm9qdXZxa2trdWpha2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTQ1MDksImV4cCI6MjA3MzE3MDUwOX0.43oP8PkWk3Rr-TewGWEiHiX7oYF-VI_g0EvA4h8B_rM
+```
+
+### 🟡 Homologação (Branch `develop` e outras)
+
+**Projeto Supabase**: `integra-prontuario-staging`
+
+```env
+VITE_SUPABASE_URL=https://kmrvojpqauwnzsygsmck.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttcnZvanBxYXV3bnpzeWdzbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MTY5NTAsImV4cCI6MjA3ODE5Mjk1MH0.sKrSEVsoqyYxNsY24PysyC_GwhUOR2ThpLZUuj2xHC8
+```
+
+### 💻 Desenvolvimento Local
+
+Use as credenciais de **Homologação** (staging).
+
+---
+
+## Configuração Local
+
+### 1. Copiar o arquivo de exemplo
+
+```bash
+cp .env.example .env.local
+```
+
+### 2. Editar `.env.local`
+
+O arquivo `.env.local` já está pré-configurado com as credenciais de homologação:
+
+```env
+VITE_SUPABASE_URL=https://kmrvojpqauwnzsygsmck.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttcnZvanBxYXV3bnpzeWdzbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MTY5NTAsImV4cCI6MjA3ODE5Mjk1MH0.sKrSEVsoqyYxNsY24PysyC_GwhUOR2ThpLZUuj2xHC8
 VITE_ENVIRONMENT=development
 ```
 
-**⚠️ IMPORTANTE:** 
-- O arquivo `.env.local` está no `.gitignore` e NÃO deve ser commitado
-- Use sempre o projeto de HOMOLOGAÇÃO para desenvolvimento local
+### 3. Iniciar o servidor de desenvolvimento
 
-### 🚀 Vercel - Production (Branch: main)
-
-Configure na Vercel Dashboard → Settings → Environment Variables → Production:
-
-```env
-VITE_SUPABASE_URL=https://[projeto-producao].supabase.co
-VITE_SUPABASE_ANON_KEY=[chave-anon-producao]
-VITE_ENVIRONMENT=production
+```bash
+yarn dev
 ```
 
-**Branch:** `main`  
-**Quando usar:** Deploy automático quando houver merge na branch `main`
-
-### 🧪 Vercel - Preview (Branch: develop)
-
-Configure na Vercel Dashboard → Settings → Environment Variables → Preview:
-
-```env
-VITE_SUPABASE_URL=https://[projeto-homologacao].supabase.co
-VITE_SUPABASE_ANON_KEY=[chave-anon-homologacao]
-VITE_ENVIRONMENT=preview
+O console mostrará qual ambiente está sendo usado:
+```
+[Supabase] Ambiente: development
+[Supabase] URL: https://kmrvojpqauwnzsygsmck.supabase.co
 ```
 
-**Branch:** `develop`  
-**Quando usar:** Deploy automático quando houver merge na branch `develop`
+---
 
-### 🔧 Vercel - Development
+## Configuração na Vercel
 
-Configure na Vercel Dashboard → Settings → Environment Variables → Development:
+### Passo a Passo
 
-```env
-VITE_SUPABASE_URL=https://[projeto-homologacao].supabase.co
-VITE_SUPABASE_ANON_KEY=[chave-anon-homologacao]
-VITE_ENVIRONMENT=development
+1. **Acesse o Dashboard da Vercel**
+   - Vá para: https://vercel.com/dashboard
+   - Selecione seu projeto
+
+2. **Acesse Environment Variables**
+   - Settings → Environment Variables
+
+3. **Configure as Variáveis de PRODUÇÃO**
+
+   | Variable Name | Value | Environments |
+   |--------------|-------|--------------|
+   | `VITE_SUPABASE_URL` | `https://ssxdmbojuvqkkkujakdk.supabase.co` | ✅ Production |
+   | `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzeGRtYm9qdXZxa2trdWpha2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTQ1MDksImV4cCI6MjA3MzE3MDUwOX0.43oP8PkWk3Rr-TewGWEiHiX7oYF-VI_g0EvA4h8B_rM` | ✅ Production |
+
+4. **Configure as Variáveis de HOMOLOGAÇÃO**
+
+   | Variable Name | Value | Environments |
+   |--------------|-------|--------------|
+   | `VITE_SUPABASE_URL` | `https://kmrvojpqauwnzsygsmck.supabase.co` | ✅ Preview, ✅ Development |
+   | `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttcnZvanBxYXV3bnpzeWdzbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MTY5NTAsImV4cCI6MjA3ODE5Mjk1MH0.sKrSEVsoqyYxNsY24PysyC_GwhUOR2ThpLZUuj2xHC8` | ✅ Preview, ✅ Development |
+
+5. **Confirme a configuração**
+   - Clique em "Save" para cada variável
+
+6. **Configure a Branch de Produção**
+   - Settings → Git → Production Branch
+   - Defina como: `main`
+
+### Resultado
+
+- **Push para `main`** → Deploy de produção com banco de produção
+- **Push para `develop` ou outras branches** → Deploy preview com banco de homologação
+- **Desenvolvimento local** → Usa banco de homologação
+
+---
+
+## Como Obter as Credenciais
+
+### No Supabase Dashboard
+
+1. Acesse: https://app.supabase.com/
+2. Selecione o projeto desejado
+3. Vá em: **Settings** → **API**
+4. Copie:
+   - **Project URL** → `VITE_SUPABASE_URL`
+   - **Project API keys** → `anon` `public` → `VITE_SUPABASE_ANON_KEY`
+
+### Projetos Configurados
+
+- **Produção**: `integra-prontuario-prod` → `ssxdmbojuvqkkkujakdk`
+- **Homologação**: `integra-prontuario-staging` → `kmrvojpqauwnzsygsmck`
+
+---
+
+## 🔒 Segurança
+
+### ⚠️ IMPORTANTE
+
+- **NUNCA** commite o arquivo `.env.local` no git
+- O `.gitignore` já está configurado para ignorar `*.local`
+- A `ANON_KEY` é segura para uso público (client-side)
+- A `SERVICE_ROLE_KEY` NUNCA deve ser exposta no frontend
+
+### Verificação
+
+Para verificar se o arquivo está sendo ignorado:
+
+```bash
+git status
+# .env.local não deve aparecer
 ```
 
-**Quando usar:** Deploy de previews de PRs individuais
+---
 
-## Como Obter as Credenciais do Supabase
+## 📚 Referências
 
-### 1. Acesse o Dashboard Supabase
-- https://supabase.com/dashboard
-- Faça login na sua conta
+- [Supabase Environment Variables](https://supabase.com/docs/guides/getting-started/local-development#environment-variables)
+- [Vercel Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
+- [Vite Environment Variables](https://vitejs.dev/guide/env-and-mode.html)
 
-### 2. Selecione o Projeto
-- Para **Produção**: Selecione o projeto de produção
-- Para **Homologação**: Selecione o projeto de homologação
+---
 
-### 3. Obtenha as Credenciais
-- Vá em **Settings** → **API**
-- Encontre a seção **Project API keys**
-- Copie a **anon public** key (NÃO a service_role key!)
-
-### 4. Obtenha a URL
-- Na mesma página, encontre a seção **Project URL**
-- A URL está no formato: `https://[project-id].supabase.co`
-
-## Verificação
-
-Após configurar as variáveis, você pode verificar se estão corretas:
-
-1. **Local:** Execute `yarn dev` e verifique o console do navegador
-2. **Vercel:** Verifique os logs do deploy na Vercel Dashboard
-
-## Troubleshooting
+## 🆘 Troubleshooting
 
 ### Erro: "Config do Supabase ausente ou inválida"
-- Verifique se todas as variáveis estão configuradas
-- Verifique se a ANON_KEY está correta (anon public, não service_role)
-- Verifique se a URL está no formato correto
 
-### Ambiente incorreto detectado
-- Verifique se `VITE_ENVIRONMENT` está configurado corretamente
-- Na Vercel, verifique se as variáveis estão no ambiente correto (Production/Preview/Development)
+**Causa**: Variável `VITE_SUPABASE_ANON_KEY` não está definida.
 
-### Não consegue conectar ao Supabase
-- Verifique se o projeto Supabase está ativo
-- Verifique se as políticas RLS (Row Level Security) estão configuradas corretamente
-- Verifique se a URL e a key correspondem ao mesmo projeto
+**Solução**:
+- Local: Verifique se o arquivo `.env.local` existe e está correto
+- Vercel: Verifique se as variáveis estão configuradas no dashboard
+
+### Ambiente errado está sendo usado
+
+**Verificar qual ambiente está ativo**:
+- Abra o console do navegador
+- Em desenvolvimento/preview, verá: `[Supabase] Ambiente: development` ou `preview`
+- Em produção, não verá logs (por segurança)
+
+**Forçar ambiente específico**:
+```env
+VITE_ENVIRONMENT=development
+```
+
+---
+
+**Última atualização**: Janeiro 2025
 
