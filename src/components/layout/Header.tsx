@@ -38,11 +38,10 @@ export function Header({ onMenuClick }: HeaderProps) {
         {/* Logo (Mobile) */}
         <div className="flex items-center gap-2 lg:hidden">
           <img
-            src="/IntegraLogo.png"
+            src="/Logo.png"
             alt="Integra"
-            className="w-8 h-8 object-contain"
+            className="h-8 object-contain"
           />
-          <span className="font-semibold">Integra</span>
         </div>
 
         {/* Spacer */}

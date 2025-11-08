@@ -37,11 +37,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
             <img
-              src="/IntegraLogo.png"
-              alt="Integra"
-              className="w-10 h-10 object-contain"
+              src="/Logo.png"
+              alt="Integra Prontuário"
+              className="h-10 object-contain"
             />
-            <span className="font-semibold text-lg">Integra</span>
           </div>
           <button
             onClick={onClose}
