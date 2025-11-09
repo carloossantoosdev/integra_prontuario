@@ -232,5 +232,5 @@ Para dúvidas ou problemas, entre em contato com a equipe de desenvolvimento.
 
 ---
 
-**Última atualização**: Janeiro 2025
+**Última atualização**: Novembro 2025
 
