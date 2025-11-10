@@ -1,6 +1,5 @@
-import { Menu, Moon, Sun, LogOut } from 'lucide-react';
+import { Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/providers/ThemeProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,8 +8,7 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { theme, setTheme } = useTheme();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -18,31 +16,26 @@ export function Header({ onMenuClick }: HeaderProps) {
     navigate('/login');
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
-
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center px-4 gap-4">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ borderColor: 'var(--color-border)' }}>
+      <div className="flex h-16 items-center px-4 gap-4">
         {/* Menu Button (Mobile) */}
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden hover:bg-secondary/10"
           onClick={onMenuClick}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5" style={{ color: 'var(--integra-turquoise)' }} />
         </Button>
 
         {/* Logo (Mobile) */}
         <div className="flex items-center gap-2 lg:hidden">
           <img
-            src="/IntegraLogo.png"
+            src="/Logo.png"
             alt="Integra"
-            className="w-8 h-8 object-contain"
+            className="h-10 object-contain"
           />
-          <span className="font-semibold">Integra</span>
         </div>
 
         {/* Spacer */}
@@ -50,22 +43,19 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-          >
-            {theme === 'light' ? (
-              <Moon className="h-5 w-5" />
-            ) : (
-              <Sun className="h-5 w-5" />
-            )}
-          </Button>
+          {/* User Name */}
+          {user?.name && (
+            <span className="text-sm font-medium hidden sm:inline-block" style={{ color: 'var(--integra-petroleum)' }}>
+              {user.name}
+            </span>
+          )}
 
           <Button
             variant="ghost"
             size="icon"
             onClick={handleLogout}
+            className="hover:bg-destructive/10"
+            style={{ color: 'var(--integra-petroleum)' }}
           >
             <LogOut className="h-5 w-5" />
           </Button>

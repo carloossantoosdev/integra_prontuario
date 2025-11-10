@@ -37,11 +37,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
             <img
-              src="/IntegraLogo.png"
-              alt="Integra"
-              className="w-10 h-10 object-contain"
+              src="/Logo.png"
+              alt="Integra Prontuário"
+              className="h-10 object-contain"
             />
-            <span className="font-semibold text-lg">Integra</span>
           </div>
           <button
             onClick={onClose}
@@ -63,11 +62,16 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 to={item.path}
                 onClick={onClose}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
+                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-medium',
                   isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent hover:text-accent-foreground'
+                    ? 'text-white shadow-md'
+                    : 'hover:bg-secondary/10'
                 )}
+                style={isActive ? { 
+                  background: 'linear-gradient(135deg, #1ba0a4 0%, #15777a 100%)' 
+                } : {
+                  color: 'var(--integra-text-nav)'
+                }}
               >
                 <Icon className="h-5 w-5" />
                 <span>{item.label}</span>

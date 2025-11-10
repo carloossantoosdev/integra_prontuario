@@ -4,15 +4,52 @@
 
 @layer base {
   :root {
+    /* ========================================
+       IDENTIDADE VISUAL INTEGRA
+       ======================================== */
+    
+    /* Cores da Marca Integra */
+    --integra-lime: #90bc21; /* verde lima - esperança, vitalidade */
+    --integra-turquoise: #1ba0a4; /* azul turquesa - comunicação fluida */
+    --integra-petroleum: #275e65; /* azul petróleo - serenidade (Primary) */
+    --integra-ice: #f7fbfc; /* branco gelo */
+    --integra-cyan: #67ccc9; /* azul ciano claro */
+    --integra-light-blue: #eaf2f2; /* azul muito claro */
+    --integra-teal-dark: #2f5d5d; /* verde azulado escuro */
+    --integra-navy: #002e38; /* azul marinho escuro */
+    --integra-primary-darker: #0f363f; /* bordas */
+    --integra-primary-darkest: #051a21; /* títulos */
+    --integra-text-nav: #455254; /* textos de navegação */
+    
+    /* Derivações hover/active */
+    --integra-lime-700: #6a8e17;
+    --integra-turquoise-700: #15777a;
+    --integra-petroleum-700: #1f4a4f;
+    
+    /* Tokens de UI */
+    --color-primary: var(--integra-turquoise);
+    --color-primary-700: var(--integra-turquoise-700);
+    --color-accent: var(--integra-lime);
+    --color-accent-700: var(--integra-lime-700);
+    --color-emphasis: var(--integra-petroleum);
+    --color-emphasis-700: var(--integra-petroleum-700);
+    --color-bg-soft: #eef6f7;
+    --color-border: #d9e4e6;
+    --color-muted: #475569;
+    
+    /* ========================================
+       SHADCN/UI TOKENS
+       ======================================== */
+    
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 195 44% 28%;
+    --primary: 195 44% 28%; /* petroleum */
     --primary-foreground: 0 0% 100%;
-    --secondary: 179 69% 37%;
+    --secondary: 179 69% 37%; /* turquoise */
     --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -33,9 +70,9 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 179 69% 37%;
+    --primary: 179 69% 37%; /* turquoise */
     --primary-foreground: 0 0% 100%;
-    --secondary: 195 44% 28%;
+    --secondary: 195 44% 28%; /* petroleum */
     --secondary-foreground: 0 0% 100%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -56,4 +93,79 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ========================================
+   UTILITÁRIOS DA MARCA INTEGRA
+   ======================================== */
+
+@layer components {
+  /* Gradiente da marca */
+  .brand-gradient {
+    background: linear-gradient(135deg, #1ba0a4 0%, #275e65 100%);
+  }
+  
+  /* Link da marca com hover */
+  .brand-link {
+    color: var(--color-primary);
+  }
+  .brand-link:hover {
+    color: var(--color-primary-700);
+  }
+  
+  /* Título com sublinhado accent */
+  .title-accent {
+    position: relative;
+  }
+  .title-accent::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 4px;
+    margin-top: 8px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+  }
+  
+  /* Seção com fundo suave */
+  .section-soft {
+    background-color: var(--color-bg-soft);
+  }
+}
+
+/* ========================================
+   SCROLLBAR CUSTOMIZADO - INTEGRA
+   ======================================== */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--integra-cyan) var(--integra-light-blue);
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--integra-light-blue);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7cd3d1 0%, var(--integra-turquoise) 100%);
+  border-radius: 10px;
+  border: 2px solid var(--integra-light-blue);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--integra-cyan) 0%, var(--integra-turquoise-700) 100%);
+  border-color: var(--integra-ice);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--integra-turquoise);
 }
