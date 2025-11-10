@@ -12,7 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
 }
@@ -25,13 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async (): Promise<boolean> => {
     try {
-      // Verificar se há um token temporário de desenvolvimento
-      const tempAuth = localStorage.getItem('temp_auth');
-      if (tempAuth === 'true') {
-        setUser({ id: 'temp', email: 'dev@integra.local', name: 'Dev User' });
-        return true;
-      }
-
       // Verificar autenticação do Supabase
       const {
         data: { session },
@@ -55,22 +48,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async () => {
+  const login = async (email: string, password: string) => {
     try {
-      // Login temporário de desenvolvimento
-      localStorage.setItem('temp_auth', 'true');
-      setUser({ id: 'temp', email: 'dev@integra.local', name: 'Dev User' });
-      toast.success('Login realizado com sucesso!');
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.user_metadata?.name || data.user.email,
+        });
+        toast.success('Login realizado com sucesso!');
+      }
     } catch (error: any) {
       console.error('Erro ao fazer login:', error);
-      toast.error(error?.message || 'Erro ao fazer login');
+      
+      // Mensagens de erro em português
+      let errorMessage = 'Erro ao fazer login';
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Email ou senha incorretos';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Por favor, confirme seu email antes de fazer login';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
       throw error;
     }
   };
 
   const logout = async () => {
     try {
-      localStorage.removeItem('temp_auth');
       await supabaseClient.auth.signOut();
       setUser(null);
       toast.success('Logout realizado com sucesso!');
@@ -82,6 +98,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     checkAuth().finally(() => setLoading(false));
+  }, []);
+
+  // Listener para mudanças de autenticação
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.name || session.user.email,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
