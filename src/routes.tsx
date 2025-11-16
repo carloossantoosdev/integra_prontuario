@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ProtectedRoute } from './components/ProtectedRoute';
+// import { ProtectedRoute } from './components/ProtectedRoute'; // AUTENTICAÇÃO COMENTADA
 import { AppLayout } from './components/layout/AppLayout';
 
 // Importações diretas (páginas carregadas imediatamente)
@@ -28,18 +28,24 @@ const PageLoader = () => (
 export const AppRoutes = () => {
   return (
     <Routes>
+      {/* ============================================ */}
+      {/* ROTA DE LOGIN COMENTADA TEMPORARIAMENTE */}
+      {/* Para reativar, descomente o bloco abaixo */}
+      {/* ============================================ */}
+      {/*
       <Route
         path="/login"
         element={<Login />}
       />
+      */}
 
       <Route
         path="*"
         element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
+          /* AUTENTICAÇÃO COMENTADA - Para reativar, envolva <AppLayout> com <ProtectedRoute> */
+          <AppLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
                   <Route
                     path="/"
                     element={<Home />}
@@ -99,7 +105,7 @@ export const AppRoutes = () => {
                 </Routes>
               </Suspense>
             </AppLayout>
-          </ProtectedRoute>
+          /* AUTENTICAÇÃO COMENTADA */
         }
       />
     </Routes>
