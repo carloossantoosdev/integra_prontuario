@@ -74,8 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       let errorMessage = 'Erro ao fazer login';
       if (error.message.includes('Invalid login credentials')) {
         errorMessage = 'Email ou senha incorretos';
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'Por favor, confirme seu email antes de fazer login';
       } else if (error.message) {
         errorMessage = error.message;
       }
