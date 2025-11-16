@@ -7,6 +7,12 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  // ============================================
+  // AUTENTICAÇÃO COMENTADA TEMPORARIAMENTE
+  // Para reativar, descomente o bloco abaixo
+  // ============================================
+  
+  /* 
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -25,6 +31,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       />
     );
   }
+  */
 
+  // Retorna direto os children sem verificar autenticação
   return <>{children}</>;
 }
