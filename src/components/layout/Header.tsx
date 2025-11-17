@@ -1,19 +1,13 @@
 import { Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-// import { useAuth } from '@/providers/AuthProvider'; // AUTENTICAÇÃO COMENTADA
-// import { useNavigate } from 'react-router-dom'; // AUTENTICAÇÃO COMENTADA
+import { useAuth } from '@/providers/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  // ============================================
-  // AUTENTICAÇÃO COMENTADA TEMPORARIAMENTE
-  // Para reativar, descomente os blocos abaixo
-  // ============================================
-  
-  /*
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +15,6 @@ export function Header({ onMenuClick }: HeaderProps) {
     await logout();
     navigate('/login');
   };
-  */
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" style={{ borderColor: 'var(--color-border)' }}>
@@ -50,8 +43,6 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* AUTENTICAÇÃO COMENTADA - Nome do usuário e botão de logout */}
-          {/*
           {user?.name && (
             <span className="text-sm font-medium hidden sm:inline-block" style={{ color: 'var(--integra-petroleum)' }}>
               {user.name}
@@ -67,7 +58,6 @@ export function Header({ onMenuClick }: HeaderProps) {
           >
             <LogOut className="h-5 w-5" />
           </Button>
-          */}
         </div>
       </div>
     </header>
