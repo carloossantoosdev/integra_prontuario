@@ -298,31 +298,36 @@ export const PacienteShow = () => {
                       {moment(date).format('DD/MM/YYYY')}
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4">
-                      {vital.ssvv_inicial && hasValue(vital.ssvv_inicial) && (
-                        <div>
-                          <h4 className="font-semibold mb-2">
-                            Sinais Vitais Iniciais
-                          </h4>
-                          <Table>
-                            <TableBody>
-                              {renderDataTable(vital.ssvv_inicial)}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      )}
+                      {/* Sinais Vitais - Lado a lado no desktop */}
+                      {(vital.ssvv_inicial && hasValue(vital.ssvv_inicial)) || (vital.ssvv_final && hasValue(vital.ssvv_final)) ? (
+                        <div className="flex flex-col md:flex-row gap-4">
+                          {vital.ssvv_inicial && hasValue(vital.ssvv_inicial) && (
+                            <div className="flex-1">
+                              <h4 className="font-semibold mb-2">
+                                Sinais Vitais Iniciais
+                              </h4>
+                              <Table>
+                                <TableBody>
+                                  {renderDataTable(vital.ssvv_inicial)}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          )}
 
-                      {vital.ssvv_final && hasValue(vital.ssvv_final) && (
-                        <div>
-                          <h4 className="font-semibold mb-2">
-                            Sinais Vitais Finais
-                          </h4>
-                          <Table>
-                            <TableBody>
-                              {renderDataTable(vital.ssvv_final)}
-                            </TableBody>
-                          </Table>
+                          {vital.ssvv_final && hasValue(vital.ssvv_final) && (
+                            <div className="flex-1">
+                              <h4 className="font-semibold mb-2">
+                                Sinais Vitais Finais
+                              </h4>
+                              <Table>
+                                <TableBody>
+                                  {renderDataTable(vital.ssvv_final)}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      ) : null}
 
                       {vital.ausculta_pulmonar && hasValue(vital.ausculta_pulmonar) && (
                         <div>
