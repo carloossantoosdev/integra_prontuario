@@ -28,9 +28,7 @@ export const SinaisVitaisForm = ({
                       ? 'text'
                       : 'number'
                   }
-                  {...register(`ssvv_inicial.${fieldName}`, {
-                    required: `${fieldName} é obrigatório`,
-                  })}
+                  {...register(`ssvv_inicial.${fieldName}`)}
                 />
                 {errors.ssvv_inicial && fieldName in errors.ssvv_inicial && (
                   <p className="text-sm text-destructive mt-1">
@@ -58,9 +56,7 @@ export const SinaisVitaisForm = ({
                       ? 'text'
                       : 'number'
                   }
-                  {...register(`ssvv_final.${fieldName}`, {
-                    required: `${fieldName} é obrigatório`,
-                  })}
+                  {...register(`ssvv_final.${fieldName}`)}
                 />
                 {errors.ssvv_final && fieldName in errors.ssvv_final && (
                   <p className="text-sm text-destructive mt-1">

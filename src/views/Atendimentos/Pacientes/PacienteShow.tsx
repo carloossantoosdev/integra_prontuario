@@ -97,14 +97,23 @@ export const PacienteShow = () => {
     return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
   };
 
+  const hasValue = (value: any): boolean => {
+    if (value === null || value === undefined || value === '') return false;
+    if (typeof value === 'object') {
+      return Object.values(value).some(v => hasValue(v));
+    }
+    return true;
+  };
+
   const renderValue = (value: any): React.ReactNode => {
-    if (value === null || value === undefined) return '-';
+    if (!hasValue(value)) return null;
+    
     if (typeof value === 'object') {
       // Se for um objeto, renderizar suas propriedades formatadas
       const entries = Object.entries(value)
-        .filter(([_, v]) => v !== false && v !== null && v !== undefined && v !== '');
+        .filter(([_, v]) => hasValue(v));
       
-      if (entries.length === 0) return '-';
+      if (entries.length === 0) return null;
       
       return (
         <div className="space-y-1">
@@ -124,14 +133,18 @@ export const PacienteShow = () => {
   const renderDataTable = (data: any) => {
     if (!data || typeof data !== 'object') return null;
 
-    return Object.entries(data).map(([key, value]) => (
-      <TableRow key={key}>
-        <TableCell className="font-medium capitalize">
-          {formatFieldName(key)}
-        </TableCell>
-        <TableCell>{renderValue(value)}</TableCell>
-      </TableRow>
-    ));
+    const rows = Object.entries(data)
+      .filter(([_, value]) => hasValue(value))
+      .map(([key, value]) => (
+        <TableRow key={key}>
+          <TableCell className="font-medium capitalize">
+            {formatFieldName(key)}
+          </TableCell>
+          <TableCell>{renderValue(value)}</TableCell>
+        </TableRow>
+      ));
+
+    return rows.length > 0 ? rows : null;
   };
 
   if (isLoading || loadingVitals) {
@@ -285,7 +298,7 @@ export const PacienteShow = () => {
                       {moment(date).format('DD/MM/YYYY')}
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4">
-                      {vital.ssvv_inicial && (
+                      {vital.ssvv_inicial && hasValue(vital.ssvv_inicial) && (
                         <div>
                           <h4 className="font-semibold mb-2">
                             Sinais Vitais Iniciais
@@ -298,7 +311,7 @@ export const PacienteShow = () => {
                         </div>
                       )}
 
-                      {vital.ssvv_final && (
+                      {vital.ssvv_final && hasValue(vital.ssvv_final) && (
                         <div>
                           <h4 className="font-semibold mb-2">
                             Sinais Vitais Finais
@@ -311,13 +324,13 @@ export const PacienteShow = () => {
                         </div>
                       )}
 
-                      {vital.ausculta_pulmonar && Object.keys(vital.ausculta_pulmonar).length > 0 && (
+                      {vital.ausculta_pulmonar && hasValue(vital.ausculta_pulmonar) && (
                         <div>
                           <h4 className="font-semibold mb-2">
                             Ausculta Pulmonar
                           </h4>
                           
-                          {vital.ausculta_pulmonar.localizacao && Object.keys(vital.ausculta_pulmonar.localizacao).length > 0 && (
+                          {vital.ausculta_pulmonar.localizacao && hasValue(vital.ausculta_pulmonar.localizacao) && (
                             <div className="mb-3">
                               <p className="font-medium text-sm mb-1">Localização:</p>
                               <div className="flex flex-wrap gap-2">
@@ -333,7 +346,7 @@ export const PacienteShow = () => {
                             </div>
                           )}
 
-                          {vital.ausculta_pulmonar.ruidos && Object.keys(vital.ausculta_pulmonar.ruidos).length > 0 && (
+                          {vital.ausculta_pulmonar.ruidos && hasValue(vital.ausculta_pulmonar.ruidos) && (
                             <div className="mb-3">
                               <p className="font-medium text-sm mb-1">Ruídos:</p>
                               <div className="flex flex-wrap gap-2">
@@ -349,7 +362,7 @@ export const PacienteShow = () => {
                             </div>
                           )}
 
-                          {vital.ausculta_pulmonar.mv && Object.keys(vital.ausculta_pulmonar.mv).length > 0 && (
+                          {vital.ausculta_pulmonar.mv && hasValue(vital.ausculta_pulmonar.mv) && (
                             <div className="mb-3">
                               <p className="font-medium text-sm mb-1">Murmúrio Vesicular (MV):</p>
                               <div className="flex flex-wrap gap-2">
@@ -368,7 +381,7 @@ export const PacienteShow = () => {
                       )}
 
                       {/* Treinamento Aeróbico */}
-                      {vital.treinamento_aerobico && Object.keys(vital.treinamento_aerobico).length > 0 && (
+                      {vital.treinamento_aerobico && hasValue(vital.treinamento_aerobico) && (
                         <div>
                           <h4 className="font-semibold mb-2">1. Treinamento Aeróbico</h4>
                           <Table>
@@ -380,7 +393,7 @@ export const PacienteShow = () => {
                       )}
 
                       {/* Treinamento Resistido */}
-                      {vital.treinamento_resistido && Object.keys(vital.treinamento_resistido).length > 0 && (
+                      {vital.treinamento_resistido && hasValue(vital.treinamento_resistido) && (
                         <div>
                           <h4 className="font-semibold mb-2">2. Treinamento Resistido</h4>
                           <Table>
@@ -392,7 +405,7 @@ export const PacienteShow = () => {
                       )}
 
                       {/* Exercícios Funcionais */}
-                      {vital.treinamento_funcional && Object.keys(vital.treinamento_funcional).length > 0 && (
+                      {vital.treinamento_funcional && hasValue(vital.treinamento_funcional) && (
                         <div>
                           <h4 className="font-semibold mb-2">3. Exercícios Funcionais</h4>
                           <Table>
@@ -404,7 +417,7 @@ export const PacienteShow = () => {
                       )}
 
                       {/* TMI */}
-                      {vital.tmi && Object.keys(vital.tmi).length > 0 && (
+                      {vital.tmi && hasValue(vital.tmi) && (
                         <div>
                           <h4 className="font-semibold mb-2">4. TMI (Treinamento Muscular Inspiratório)</h4>
                           <Table>
@@ -416,7 +429,7 @@ export const PacienteShow = () => {
                       )}
 
                       {/* Terapia de Expansão */}
-                      {vital.terapia_expansao && Object.keys(vital.terapia_expansao).length > 0 && (
+                      {vital.terapia_expansao && hasValue(vital.terapia_expansao) && (
                         <div>
                           <h4 className="font-semibold mb-2">5. Terapia de Expansão Pulmonar</h4>
                           <Table>
@@ -428,7 +441,7 @@ export const PacienteShow = () => {
                       )}
 
                       {/* Terapia de Remoção de Secreção */}
-                      {vital.terapia_remo_secrecao && Object.keys(vital.terapia_remo_secrecao).length > 0 && (
+                      {vital.terapia_remo_secrecao && hasValue(vital.terapia_remo_secrecao) && (
                         <div>
                           <h4 className="font-semibold mb-2">6. Terapia de Remoção de Secreção</h4>
                           <Table>

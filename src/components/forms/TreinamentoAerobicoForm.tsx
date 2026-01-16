@@ -35,9 +35,7 @@ export const TreinamentoAerobicoForm = ({
                 <RadioGroupItem
                   value={value}
                   id={`tipo_${value}`}
-                  {...register('treinamento_aerobico.tipo', {
-                    required: 'Tipo de treinamento é obrigatório',
-                  })}
+                  {...register('treinamento_aerobico.tipo')}
                 />
                 <Label
                   htmlFor={`tipo_${value}`}
@@ -62,9 +60,7 @@ export const TreinamentoAerobicoForm = ({
           <Label htmlFor="intensidade">Intensidade</Label>
           <Input
             id="intensidade"
-            {...register('treinamento_aerobico.intensidade', {
-              required: 'Intensidade é obrigatória',
-            })}
+            {...register('treinamento_aerobico.intensidade')}
           />
           {errors.treinamento_aerobico && 'intensidade' in errors.treinamento_aerobico && (
             <p className="text-sm text-destructive mt-1">
@@ -77,9 +73,7 @@ export const TreinamentoAerobicoForm = ({
           <Label htmlFor="duracao">Duração</Label>
           <Input
             id="duracao"
-            {...register('treinamento_aerobico.duracao', {
-              required: 'Duração é obrigatória',
-            })}
+            {...register('treinamento_aerobico.duracao')}
           />
           {errors.treinamento_aerobico && 'duracao' in errors.treinamento_aerobico && (
             <p className="text-sm text-destructive mt-1">
@@ -92,9 +86,7 @@ export const TreinamentoAerobicoForm = ({
           <Label htmlFor="carga">Carga</Label>
           <Input
             id="carga"
-            {...register('treinamento_aerobico.carga', {
-              required: 'Carga é obrigatória',
-            })}
+            {...register('treinamento_aerobico.carga')}
           />
           {errors.treinamento_aerobico && 'carga' in errors.treinamento_aerobico && (
             <p className="text-sm text-destructive mt-1">

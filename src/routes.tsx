@@ -14,7 +14,6 @@ const PacienteEdit = lazy(() => import('./views/Atendimentos/Pacientes/PacienteE
 const PacienteShow = lazy(() => import('./views/Atendimentos/Pacientes/PacienteShow').then(m => ({ default: m.PacienteShow })));
 const EvolucaoRcpCreate = lazy(() => import('./views/Atendimentos/EvolucaoRCP/EvolucaoRcpCreate').then(m => ({ default: m.EvolucaoRcpCreate })));
 const EvolucaoRcpList = lazy(() => import('./views/Atendimentos/EvolucaoRCP/EvolucaoRcpList').then(m => ({ default: m.EvolucaoRcpList })));
-const EvolucaoEdit = lazy(() => import('./views/Atendimentos/EvolucaoRCP/EvolucaoEdit').then(m => ({ default: m.EvolucaoEdit })));
 const EvolucaoDnmCreate = lazy(() => import('./views/Atendimentos/EvolucaoDNM/EvolucaoDnmCreate').then(m => ({ default: m.EvolucaoDnmCreate })));
 const EvolucaoDnmList = lazy(() => import('./views/Atendimentos/EvolucaoDNM/EvolucaoDnmList').then(m => ({ default: m.EvolucaoDnmList })));
 
@@ -71,10 +70,6 @@ export const AppRoutes = () => {
                   <Route
                     path="/evolucao_rcp"
                     element={<EvolucaoRcpList />}
-                  />
-                  <Route
-                    path="/evolucao_rcp/edit/:id"
-                    element={<EvolucaoEdit />}
                   />
 
                   {/* Evolução DNM */}
