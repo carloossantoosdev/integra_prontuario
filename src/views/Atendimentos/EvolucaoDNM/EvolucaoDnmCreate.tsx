@@ -178,8 +178,15 @@ export const EvolucaoDnmCreate = () => {
               <Input
                 id="data_atendimento"
                 type="date"
-                {...register('data_atendimento')}
+                {...register('data_atendimento', {
+                  required: 'Data de atendimento é obrigatória',
+                })}
               />
+              {errors.data_atendimento && (
+                <p className="text-sm text-destructive mt-1">
+                  {errors.data_atendimento.message as string}
+                </p>
+              )}
             </div>
 
             <div>
