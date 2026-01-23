@@ -132,6 +132,7 @@ export const PacienteList = () => {
       header: 'Valor',
       cell: ({ row }) => {
         const valor = row.getValue('valor') as number;
+        // Valor já está em reais no banco
         return valor
           ? `R$ ${valor.toLocaleString('pt-BR', {
               minimumFractionDigits: 2,

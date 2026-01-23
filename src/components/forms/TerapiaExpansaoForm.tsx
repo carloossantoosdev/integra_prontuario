@@ -80,6 +80,7 @@ export const TerapiaExpansaoForm = ({
                     </Label>
                     <Input
                       id={`${exercise.value}_parametros`}
+                      placeholder="Ex: IPAP 12 cmH2O, EPAP 8 cmH2O"
                       {...register(
                         `terapia_expansao.${exercise.value}.parametros`
                       )}
@@ -105,7 +106,7 @@ export const TerapiaExpansaoForm = ({
                       <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
                       <Input
                         id={`${exercise.value}_carga`}
-                        placeholder="Ex: 5kg"
+                        placeholder="Ex: 10 cmH2O"
                         {...register(
                           `terapia_expansao.${exercise.value}.carga`
                         )}
