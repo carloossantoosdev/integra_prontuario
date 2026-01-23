@@ -51,6 +51,7 @@ export const TerapiaRemoSecrecaoForm = ({
         const isChecked = Boolean(selected[exercise.value]);
         const isVNI = exercise.value === 'vni';
         const isRTA = exercise.value === 'rta';
+        const isAerobika = exercise.value === 'aerobika';
 
         return (
           <div
@@ -82,6 +83,7 @@ export const TerapiaRemoSecrecaoForm = ({
                     </Label>
                     <Input
                       id={`${exercise.value}_parametros`}
+                      placeholder="Ex: IPAP 12 cmH2O, EPAP 8 cmH2O"
                       {...register(
                         `terapia_remo_secrecao.${exercise.value}.parametros`
                       )}
@@ -107,7 +109,7 @@ export const TerapiaRemoSecrecaoForm = ({
                       <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
                       <Input
                         id={`${exercise.value}_carga`}
-                        placeholder="Ex: 5kg"
+                        placeholder={isAerobika ? "Ex: 5kg" : "Ex: 10 cmH2O"}
                         {...register(
                           `terapia_remo_secrecao.${exercise.value}.carga`
                         )}

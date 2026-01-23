@@ -95,7 +95,7 @@ export const TmiForm = ({ register, setValue, watch }: TmiFormProps) => {
               <Label htmlFor="tmi_carga">Carga</Label>
               <Input
                 id="tmi_carga"
-                placeholder="Ex: 5kg"
+                placeholder="Ex: 30 cmH2O ou nível 3"
                 {...register('tmi.intensidade.carga')}
                 onChange={e => {
                   const masked = maskCarga(e.target.value);

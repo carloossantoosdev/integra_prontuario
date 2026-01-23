@@ -77,10 +77,10 @@ export const PacienteEdit = () => {
   const onSubmit = (data: FormData) => {
     if (!id) return;
 
-    // Converter valor de string para número
-    const valorNumerico = parseFloat(
-      data.valor.replace(/[^\d,]/g, '').replace(',', '.')
-    );
+    // Converter valor de centavos para reais
+    // O campo trabalha com centavos (ex: "20000"), dividir por 100 para salvar em reais
+    const valorEmCentavos = parseFloat(data.valor.replace(/\D/g, ''));
+    const valorEmReais = valorEmCentavos / 100;
 
     updateMutation.mutate({
       id,
@@ -88,7 +88,7 @@ export const PacienteEdit = () => {
         nome: data.nome,
         data_nascimento: data.data_nascimento,
         inicio_atendimento: data.inicio_atendimento,
-        valor: valorNumerico,
+        valor: valorEmReais,
         area_atendimento: data.area_atendimento,
       },
     });

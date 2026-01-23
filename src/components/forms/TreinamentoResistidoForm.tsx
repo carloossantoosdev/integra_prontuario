@@ -79,7 +79,7 @@ export const TreinamentoResistidoForm = ({
                   <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
                   <Input
                     id={`${exercise.value}_carga`}
-                    placeholder="Ex: 5kg"
+                    placeholder="Ex: 5kg ou vermelho"
                     {...register(
                       `treinamento_resistido.${exercise.value}.carga`
                     )}

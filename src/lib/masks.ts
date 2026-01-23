@@ -1,15 +1,14 @@
 /**
- * Máscara para campo de carga (adiciona "kg" automaticamente)
- * Exemplo: "5" -> "5kg"
+ * Máscara para campo de carga (permite letras e números)
+ * Exemplo: "5" -> "5kg", "vermelho" -> "vermelho", "amarelo 2" -> "amarelo 2"
  */
 export const maskCarga = (value: string): string => {
-  // Remove tudo que não é número
-  const numbers = value.replace(/\D/g, '');
+  // Remove apenas caracteres especiais, mantém letras, números e espaços
+  const cleaned = value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '');
 
-  if (!numbers) return '';
+  if (!cleaned) return '';
 
-  // Adiciona "kg" ao final
-  return `${numbers}kg`;
+  return cleaned;
 };
 
 /**
