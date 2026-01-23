@@ -6,24 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Loader2 } from 'lucide-react';
 import { useOne } from '@/hooks/useSupabaseQuery';
 import { useCreate } from '@/hooks/useSupabaseMutation';
 import { SinaisVitaisForm } from '@/components/forms/SinaisVitaisForm';
 import { AuscultaPulmonarForm } from '@/components/forms/AuscultaPulmonarForm';
+import { useAuth } from '@/providers/AuthProvider';
 import { toast } from 'sonner';
-
-const fisioterapeutas = [
-  { name: 'Alisson Alves de Almeida - 296436 - F', value: 'Alisson Alves' },
-  { name: 'Erika Lays Santos - 285936 - F', value: 'Erika Lays' },
-  { name: 'Rafaela Maria da Silva - 295183 - F', value: 'Rafaela Maria' },
-  { name: 'Wilayane Alves Martins - 295357 - F', value: 'Wilayane Alves' },
-];
 
 export const EvolucaoDnmCreate = () => {
   const { pacienteId } = useParams<{ pacienteId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { data: paciente, isLoading: loadingPaciente } = useOne<any>(
     'pacientes',
@@ -39,7 +33,6 @@ export const EvolucaoDnmCreate = () => {
     defaultValues: {
       ssvv_inicial: {},
       ssvv_final: {},
-      fisioterapeuta: '',
       data_atendimento: new Date().toISOString().split('T')[0],
       observacao: '',
     },
@@ -86,6 +79,8 @@ export const EvolucaoDnmCreate = () => {
     createMutation.mutate({
       patient_id: pacienteId,
       ...data,
+      fisioterapeuta: user?.name || '',
+      fisioterapeuta_crefito: user?.crefito || '',
       ausculta_pulmonar: auscultaFiltrada,
     });
   };
@@ -128,51 +123,9 @@ export const EvolucaoDnmCreate = () => {
           </CardContent>
         </Card>
 
-        {/* Fisioterapeuta, Data e Observações */}
+        {/* Data, Fisioterapeuta e Observações */}
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <div>
-              <Label className="text-base font-semibold mb-3 block">
-                Fisioterapeuta / CREFITO
-              </Label>
-              <Controller
-                name="fisioterapeuta"
-                control={control}
-                rules={{ required: 'Selecione um fisioterapeuta' }}
-                render={({ field }) => (
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {fisioterapeutas.map(({ name, value }) => (
-                        <div
-                          key={value}
-                          className="flex items-center space-x-2"
-                        >
-                          <RadioGroupItem
-                            value={value}
-                            id={`fisio_${value}`}
-                          />
-                          <Label
-                            htmlFor={`fisio_${value}`}
-                            className="font-normal cursor-pointer"
-                          >
-                            {name}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </RadioGroup>
-                )}
-              />
-              {errors.fisioterapeuta && (
-                <p className="text-sm text-destructive mt-2">
-                  {errors.fisioterapeuta.message as string}
-                </p>
-              )}
-            </div>
-
             <div>
               <Label htmlFor="data_atendimento">Data de Atendimento</Label>
               <Input
@@ -187,6 +140,21 @@ export const EvolucaoDnmCreate = () => {
                   {errors.data_atendimento.message as string}
                 </p>
               )}
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Responsável pelo Atendimento
+              </Label>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1ba0a4] to-[#275e65] flex items-center justify-center text-white font-semibold">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{user?.name || 'Usuário'}</p>
+                  <p className="text-sm text-gray-600">CREFITO: {user?.crefito || 'Não informado'}</p>
+                </div>
+              </div>
             </div>
 
             <div>

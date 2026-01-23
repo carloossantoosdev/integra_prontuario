@@ -11,6 +11,7 @@ interface TreinamentoAerobicoFormProps {
 const aerobicType = [
   { name: 'Caminhada', value: 'Caminhada' },
   { name: 'Esteira', value: 'Esteira' },
+  { name: 'Marcha estática', value: 'Marcha estática' },
   { name: 'Cicloergometria de MMSS', value: 'Cicloergometria de MMSS' },
   { name: 'Cicloergometria de MMII', value: 'Cicloergometria de MMII' },
   { name: 'Circuito Funcional', value: 'Circuito Funcional' },

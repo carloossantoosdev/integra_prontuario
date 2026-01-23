@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name: string, crefito: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
 }
@@ -35,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: session.user.id,
           email: session.user.email,
           name: session.user.user_metadata?.name || session.user.email,
+          crefito: session.user.user_metadata?.crefito || '',
         });
         return true;
       }
@@ -64,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: data.user.id,
           email: data.user.email,
           name: data.user.user_metadata?.name || data.user.email,
+          crefito: data.user.user_metadata?.crefito || '',
         });
         toast.success('Login realizado com sucesso!');
       }
@@ -74,6 +77,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       let errorMessage = 'Erro ao fazer login';
       if (error.message.includes('Invalid login credentials')) {
         errorMessage = 'Email ou senha incorretos';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
+      throw error;
+    }
+  };
+
+  const signup = async (email: string, password: string, name: string, crefito: string) => {
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name,
+            crefito: crefito,
+          },
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Não mostra toast aqui, será mostrado na tela de Login
+      // com instrução para confirmar email
+    } catch (error: any) {
+      console.error('Erro ao criar conta:', error);
+      
+      let errorMessage = 'Erro ao criar conta';
+      if (error.message.includes('already registered')) {
+        errorMessage = 'Este email já está cadastrado';
+      } else if (error.message.includes('Password should be')) {
+        errorMessage = 'A senha deve ter pelo menos 6 caracteres';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -108,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: session.user.id,
           email: session.user.email,
           name: session.user.user_metadata?.name || session.user.email,
+          crefito: session.user.user_metadata?.crefito || '',
         });
       } else {
         setUser(null);
@@ -120,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
