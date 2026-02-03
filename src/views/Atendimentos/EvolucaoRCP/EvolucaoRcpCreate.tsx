@@ -88,12 +88,15 @@ export const EvolucaoRcpCreate = () => {
       });
     }
 
+    const fisioterapeutaInfo = user?.crefito 
+      ? `${user.name} - CREFITO: ${user.crefito}`
+      : user?.name || '';
+
     createMutation.mutate({
       patient_id: pacienteId,
       ...data,
       ausculta_pulmonar: auscultaFiltrada,
-      fisioterapeuta: user?.name || '',
-      fisioterapeuta_crefito: user?.crefito || '',
+      fisioterapeuta: fisioterapeutaInfo,
     });
   };
 

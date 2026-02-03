@@ -12,3 +12,20 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Registrar service worker apenas em produção
+if (import.meta.env.PROD) {
+  import('virtual:pwa-register').then(({ registerSW }) => {
+    registerSW({
+      immediate: true,
+      onRegistered(registration) {
+        console.log('✅ PWA registrado');
+      },
+      onRegisterError(error) {
+        console.warn('⚠️ Erro ao registrar PWA:', error);
+      },
+    });
+  }).catch(() => {
+    // PWA não disponível
+  });
+}
