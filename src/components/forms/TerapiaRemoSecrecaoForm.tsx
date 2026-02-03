@@ -17,6 +17,7 @@ interface TerapiaRemoSecrecaoFormProps {
 const terapiaRemoSecrecao = [
   { name: 'EPAP válvula', value: 'epap_valvula' },
   { name: 'EPAP artesanal', value: 'epap_artesanal' },
+  { name: 'Hiperinsuflação manual', value: 'hiperinsuflacao_manual' },
   { name: 'Shaker', value: 'shaker' },
   { name: 'Aerobika', value: 'aerobika' },
   { name: 'VNI', value: 'vni' },
@@ -51,6 +52,7 @@ export const TerapiaRemoSecrecaoForm = ({
         const isChecked = Boolean(selected[exercise.value]);
         const isVNI = exercise.value === 'vni';
         const isRTA = exercise.value === 'rta';
+        const isHiperinsuflacao = exercise.value === 'hiperinsuflacao_manual';
         const isAerobika = exercise.value === 'aerobika';
 
         return (
@@ -90,13 +92,14 @@ export const TerapiaRemoSecrecaoForm = ({
                       className="w-full"
                     />
                   </div>
-                ) : isRTA ? (
+                ) : isRTA || isHiperinsuflacao ? (
                   <div>
                     <Label htmlFor={`${exercise.value}_manuseios`}>
-                      Manuseios
+                      {isHiperinsuflacao ? 'Descrição' : 'Manuseios'}
                     </Label>
                     <Input
                       id={`${exercise.value}_manuseios`}
+                      placeholder={isHiperinsuflacao ? 'Ex: 3/10 séries/repetições' : ''}
                       {...register(
                         `terapia_remo_secrecao.${exercise.value}.manuseios`
                       )}
