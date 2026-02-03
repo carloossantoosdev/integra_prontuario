@@ -25,6 +25,8 @@ const resistidoExercises = [
   { name: 'Flexão de quadril', value: 'flexao_quadril' },
   { name: 'Extensão de quadril', value: 'extensao_quadril' },
   { name: 'Flexão plantar', value: 'flexao_plantar' },
+  { name: 'Abdução de ombros', value: 'abducao_ombros' },
+  { name: 'Outro', value: 'outro' },
 ];
 
 export const TreinamentoResistidoForm = ({
@@ -40,6 +42,7 @@ export const TreinamentoResistidoForm = ({
       updatedExercises[exerciseValue] = {
         carga: '',
         series_repeticoes: '',
+        ...(exerciseValue === 'outro' && { descricao: '' }),
       };
     } else {
       delete updatedExercises[exerciseValue];
@@ -74,42 +77,58 @@ export const TreinamentoResistidoForm = ({
             </div>
 
             {isChecked && (
-              <div className="ml-6 grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
-                  <Input
-                    id={`${exercise.value}_carga`}
-                    placeholder="Ex: 5kg ou vermelho"
-                    {...register(
-                      `treinamento_resistido.${exercise.value}.carga`
-                    )}
-                    onChange={e => {
-                      const masked = maskCarga(e.target.value);
-                      setValue(
-                        `treinamento_resistido.${exercise.value}.carga`,
-                        masked
-                      );
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor={`${exercise.value}_series`}>
-                    Séries/Repetições
-                  </Label>
-                  <Input
-                    id={`${exercise.value}_series`}
-                    placeholder="Ex: 3/10"
-                    {...register(
-                      `treinamento_resistido.${exercise.value}.series_repeticoes`
-                    )}
-                    onChange={e => {
-                      const masked = maskSeriesRepeticoes(e.target.value);
-                      setValue(
-                        `treinamento_resistido.${exercise.value}.series_repeticoes`,
-                        masked
-                      );
-                    }}
-                  />
+              <div className="ml-6 space-y-4">
+                {exercise.value === 'outro' && (
+                  <div>
+                    <Label htmlFor={`${exercise.value}_descricao`}>
+                      Especifique o exercício
+                    </Label>
+                    <Input
+                      id={`${exercise.value}_descricao`}
+                      placeholder="Ex: Agachamento, Remada..."
+                      {...register(
+                        `treinamento_resistido.${exercise.value}.descricao`
+                      )}
+                    />
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
+                    <Input
+                      id={`${exercise.value}_carga`}
+                      placeholder="Ex: 5kg ou vermelho"
+                      {...register(
+                        `treinamento_resistido.${exercise.value}.carga`
+                      )}
+                      onChange={e => {
+                        const masked = maskCarga(e.target.value);
+                        setValue(
+                          `treinamento_resistido.${exercise.value}.carga`,
+                          masked
+                        );
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`${exercise.value}_series`}>
+                      Séries/Repetições
+                    </Label>
+                    <Input
+                      id={`${exercise.value}_series`}
+                      placeholder="Ex: 3/10"
+                      {...register(
+                        `treinamento_resistido.${exercise.value}.series_repeticoes`
+                      )}
+                      onChange={e => {
+                        const masked = maskSeriesRepeticoes(e.target.value);
+                        setValue(
+                          `treinamento_resistido.${exercise.value}.series_repeticoes`,
+                          masked
+                        );
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             )}
