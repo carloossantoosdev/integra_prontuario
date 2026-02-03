@@ -76,11 +76,14 @@ export const EvolucaoDnmCreate = () => {
       });
     }
 
+    const fisioterapeutaInfo = user?.crefito 
+      ? `${user.name} - CREFITO: ${user.crefito}`
+      : user?.name || '';
+
     createMutation.mutate({
       patient_id: pacienteId,
       ...data,
-      fisioterapeuta: user?.name || '',
-      fisioterapeuta_crefito: user?.crefito || '',
+      fisioterapeuta: fisioterapeutaInfo,
       ausculta_pulmonar: auscultaFiltrada,
     });
   };
