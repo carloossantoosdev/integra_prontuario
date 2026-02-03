@@ -12,6 +12,7 @@ Sistema de gerenciamento de prontuários para fisioterapia desenvolvido com Reac
 - **Gerenciamento de Estado**: React Query (TanStack Query)
 - **Formulários**: React Hook Form + Zod
 - **Roteamento**: React Router v6
+- **PWA**: Progressive Web App com Service Worker e Cache offline
 - **Deploy**: Vercel
 
 ## 📋 Pré-requisitos
@@ -63,6 +64,36 @@ npm run dev
 ```
 
 O aplicativo estará disponível em `http://localhost:5173`
+
+## 📱 Progressive Web App (PWA)
+
+Este aplicativo está configurado como um **PWA**, permitindo instalação em dispositivos móveis e computadores, além de funcionalidade offline.
+
+### Funcionalidades PWA
+
+- ✅ **Instalação**: Instale como app nativo em Android, iOS e Desktop
+- ✅ **Offline**: Funciona sem conexão à internet
+- ✅ **Atualizações automáticas**: Notifica sobre novas versões
+- ✅ **Cache inteligente**: Recursos são armazenados para acesso rápido
+- ✅ **Modo standalone**: Abre sem a barra do navegador
+
+### Como Instalar
+
+#### Android (Chrome/Edge)
+1. Abra o site no navegador
+2. Toque no menu (⋮) → "Adicionar à tela inicial"
+3. Confirme a instalação
+
+#### iOS (Safari)
+1. Abra no Safari
+2. Toque no botão compartilhar (□↑)
+3. "Adicionar à Tela de Início"
+
+#### Desktop (Chrome/Edge)
+1. Clique no ícone de instalação (⊕) na barra de endereço
+2. Ou Menu → "Instalar Integra Prontuário"
+
+Para informações detalhadas sobre configuração, ícones e troubleshooting, consulte [PWA_SETUP.md](./PWA_SETUP.md).
 
 ## 🏗️ Build para Produção
 
