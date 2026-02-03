@@ -20,6 +20,7 @@ const functionalExercises = [
   { name: 'Agachamento', value: 'agachamento' },
   { name: 'AVDs', value: 'avds' },
   { name: 'AIVDs', value: 'aivds' },
+  { name: 'Outro', value: 'outro' },
 ];
 
 export const ExerciciosFuncionaisForm = ({
@@ -32,10 +33,13 @@ export const ExerciciosFuncionaisForm = ({
   const handleCheckboxChange = (exerciseValue: string, checked: boolean) => {
     const updatedExercises = { ...selected };
     if (checked) {
-      updatedExercises[exerciseValue] =
-        exerciseValue === 'avds' || exerciseValue === 'aivds'
-          ? { descricao: '' }
-          : { carga: '', series_repeticoes: '' };
+      if (exerciseValue === 'avds' || exerciseValue === 'aivds') {
+        updatedExercises[exerciseValue] = { descricao: '' };
+      } else if (exerciseValue === 'outro') {
+        updatedExercises[exerciseValue] = { descricao: '', carga: '', series_repeticoes: '' };
+      } else {
+        updatedExercises[exerciseValue] = { carga: '', series_repeticoes: '' };
+      }
     } else {
       delete updatedExercises[exerciseValue];
     }
@@ -47,6 +51,7 @@ export const ExerciciosFuncionaisForm = ({
       {functionalExercises.map(exercise => {
         const isChecked = Boolean(selected[exercise.value]);
         const isAVD = exercise.value === 'avds' || exercise.value === 'aivds';
+        const isOutro = exercise.value === 'outro';
 
         return (
           <div
@@ -70,7 +75,7 @@ export const ExerciciosFuncionaisForm = ({
             </div>
 
             {isChecked && (
-              <div className="ml-6">
+              <div className="ml-6 space-y-4">
                 {isAVD ? (
                   <div>
                     <Label htmlFor={`${exercise.value}_descricao`}>
@@ -85,44 +90,60 @@ export const ExerciciosFuncionaisForm = ({
                     />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
-                      <Input
-                        id={`${exercise.value}_carga`}
-                        placeholder="Ex: 5kg"
-                        {...register(
-                          `treinamento_funcional.${exercise.value}.carga`
-                        )}
-                        onChange={e => {
-                          const masked = maskCarga(e.target.value);
-                          setValue(
-                            `treinamento_funcional.${exercise.value}.carga`,
-                            masked
-                          );
-                        }}
-                      />
+                  <>
+                    {isOutro && (
+                      <div>
+                        <Label htmlFor={`${exercise.value}_descricao`}>
+                          Especifique o exercício
+                        </Label>
+                        <Input
+                          id={`${exercise.value}_descricao`}
+                          placeholder="Ex: Caminhada, Polichinelo..."
+                          {...register(
+                            `treinamento_funcional.${exercise.value}.descricao`
+                          )}
+                        />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor={`${exercise.value}_carga`}>Carga</Label>
+                        <Input
+                          id={`${exercise.value}_carga`}
+                          placeholder="Ex: 5kg"
+                          {...register(
+                            `treinamento_funcional.${exercise.value}.carga`
+                          )}
+                          onChange={e => {
+                            const masked = maskCarga(e.target.value);
+                            setValue(
+                              `treinamento_funcional.${exercise.value}.carga`,
+                              masked
+                            );
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`${exercise.value}_series`}>
+                          Séries/Repetições
+                        </Label>
+                        <Input
+                          id={`${exercise.value}_series`}
+                          placeholder="Ex: 3/10"
+                          {...register(
+                            `treinamento_funcional.${exercise.value}.series_repeticoes`
+                          )}
+                          onChange={e => {
+                            const masked = maskSeriesRepeticoes(e.target.value);
+                            setValue(
+                              `treinamento_funcional.${exercise.value}.series_repeticoes`,
+                              masked
+                            );
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor={`${exercise.value}_series`}>
-                        Séries/Repetições
-                      </Label>
-                      <Input
-                        id={`${exercise.value}_series`}
-                        placeholder="Ex: 3/10"
-                        {...register(
-                          `treinamento_funcional.${exercise.value}.series_repeticoes`
-                        )}
-                        onChange={e => {
-                          const masked = maskSeriesRepeticoes(e.target.value);
-                          setValue(
-                            `treinamento_funcional.${exercise.value}.series_repeticoes`,
-                            masked
-                          );
-                        }}
-                      />
-                    </div>
-                  </div>
+                  </>
                 )}
               </div>
             )}
